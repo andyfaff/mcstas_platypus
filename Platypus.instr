@@ -42,22 +42,9 @@ TRACE
 COMPONENT origin = Progress_bar()
 AT (0, 0, 0) RELATIVE ABSOLUTE
 
-// CHECK DISTANCES OF SLIT1 
-
-
-// insert components here (e.g. Insert -> Source -> ...)
-/**
-COMPONENT source_gen = Source_gen(
-    dist=2.166, 
-    yheight=ss1vg, 
-    xwidth=0.3,
-    lambda0=3, 
-    dlambda=0.15,
-    focus_xw=0.05,
-    focus_yh=ss2vg
-)
-AT (0, 0, 0) RELATIVE PREVIOUS
-**/
+// CHECK DISTANCES OF SLIT1 from end of FOM
+// CHECK DISTANCE OF Slit2 from end of post chopper 4 guide
+// CHECK disk chopper settings
 
 COMPONENT source_div = Source_div(
     xwidth=0.05, 
@@ -119,7 +106,22 @@ COMPONENT prechopper1 = Guide_gravity(
     mbottom=1)
 AT (0, 0, 0.217) RELATIVE PREVIOUS
 
-// chopper 1 here.
+
+// chopper 1.
+// positive nu means rotating clockwise when looking down beamline.
+// positive phase means rotate anticlockwise.
+// beam centre is 320mm to middle. Beam should be centred on
+// half cutout height, i.e. radius - 0.5 * yheight
+COMPONENT chopper1 = DiskChopper(
+    theta_0=60, 
+    radius=0.35, 
+    yheight=0.06, 
+    nu=24, 
+    nslit=1, 
+    isfirst=1, 
+    phase=90)
+AT (0, 0, 0.039) RELATIVE PREVIOUS
+ROTATED (0, 0, 90) ABSOLUTE 
 
 // distance 12 + 33
 COMPONENT between_chopper1_and_2 = Guide_gravity(
@@ -131,7 +133,8 @@ COMPONENT between_chopper1_and_2 = Guide_gravity(
     mtop=1, 
     mbottom=1
 )
-AT (0, 0, 0.045) RELATIVE PREVIOUS
+AT (0, 0, 0.006) RELATIVE PREVIOUS
+ROTATED (0, 0, 0) ABSOLUTE 
 
 
 // chopper 2 here
@@ -151,6 +154,21 @@ AT (0, 0, 0.102) RELATIVE PREVIOUS
 
 
 // chopper 3 here.
+// chopper 1.
+// positive nu means rotating clockwise when looking down beamline.
+// positive phase means rotate clockwise.
+// beam centre is 320mm to middle. Beam should be centred on
+// half cutout height, i.e. radius - 0.5 * yheight
+COMPONENT chopper3 = DiskChopper(
+    theta_0=25, 
+    radius=0.35, 
+    yheight=0.06, 
+    nu=24, 
+    nslit=1, 
+    phase=12.5)
+AT (0, 0, 0.242) RELATIVE PREVIOUS
+ROTATED (0, 0, 90) ABSOLUTE 
+
 
 // this is actually 3 separate pieces of guide, 3.3 + 36.8 + 3.3, each separated by 1 mm
 // distance 236 + 12 = 248
@@ -163,7 +181,8 @@ COMPONENT between_chopper3_and_4 = Guide_gravity(
     mtop=1, 
     mbottom=1
 )
-AT (0, 0, 0.248) RELATIVE PREVIOUS
+AT (0, 0, 0.006) RELATIVE PREVIOUS
+ROTATED (0, 0, 0) ABSOLUTE 
 
 
 // chopper 4 here
