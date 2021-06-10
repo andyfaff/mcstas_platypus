@@ -1,0 +1,245 @@
+/*******************************************************************************
+* Instrument: Platypus
+*
+* %I
+* Written by: Andrew Nelson (andrew.nelson@ansto.gov.au)>
+* Date: 10/6/2021
+* Origin: ANSTO
+* %INSTRUMENT_SITE: Templates
+*
+* <instrument short description>
+*
+* %D
+* <instrument description>
+*
+* Example: <parameters=values>
+*
+* %P
+* <parameter1>: [<unit>] <parameter1 description>
+* ...
+*
+* %L
+* <reference/HTML link>
+*
+* %E
+*******************************************************************************/
+DEFINE INSTRUMENT template_simple(double sample_width=20, double foc=30.0, double guide_m=4.0)
+
+DECLARE
+%{
+double ss1vg = 20.0;
+double ss2vg = 8.955;
+double ss3vg = 8.0;
+double S23 = 3036.0;
+%}
+
+INITIALIZE
+%{
+%}
+
+TRACE
+
+COMPONENT origin = Progress_bar()
+AT (0, 0, 0) RELATIVE ABSOLUTE
+
+// CHECK DISTANCES OF SLIT1 
+
+
+// insert components here (e.g. Insert -> Source -> ...)
+/**
+COMPONENT source_gen = Source_gen(
+    dist=2.166, 
+    yheight=ss1vg, 
+    xwidth=0.3,
+    lambda0=3, 
+    dlambda=0.15,
+    focus_xw=0.05,
+    focus_yh=ss2vg
+)
+AT (0, 0, 0) RELATIVE PREVIOUS
+**/
+
+COMPONENT source_div = Source_div(
+    xwidth=0.05, 
+    yheight=20 / 1000.0, 
+    focus_aw=2 * 0.1 * 3 * 20, 
+    focus_ah=180 * (ss2vg + ss3vg) / S23 / 3.142, 
+    lambda0=11, 
+    dlambda=10)
+AT (0, 0, 0) RELATIVE PREVIOUS
+
+
+COMPONENT end_cg3_to_FOM = Guide_gravity(
+    w1=0.05, 
+    h1=0.02, 
+    w2=0.05, 
+    h2=0.02, 
+    l=2.529, 
+    mleft=3, 
+    mright=3, 
+    mtop=1, 
+    mbottom=1)
+AT (0, 0, 0) RELATIVE PREVIOUS
+
+
+// TODO: not currently simulating FOM, just the surrounding guide
+COMPONENT FOM = Guide_gravity(
+    w1=0.05, 
+    h1=0.02, 
+    w2=0.05,
+    h2=0.02,
+    l=0.567, 
+    mleft=3, 
+    mright=3, 
+    mtop=0, 
+    mbottom=1)
+AT (0, 0, 2.530) RELATIVE PREVIOUS
+
+
+// TODO the distance from the end of the FOM is guessed.
+// But it's 256 mm before chopper 1
+// roughly 50 mm after end of FOM
+COMPONENT slit1 = Slit(
+    xwidth=0.05, 
+    yheight=ss1vg/1000.0)
+AT (0, 0, 0.617) RELATIVE PREVIOUS
+
+
+// guide just before chopper1
+// distance calculated as 256-33 - 6 = 217 mm
+// 256 is distance from slit1 to chopper 1. roughly 6 mm from end of guide to chopper 1
+// guide is 33 mm long.
+COMPONENT prechopper1 = Guide_gravity(
+    w1=0.05, 
+    h1=0.02, 
+    l=0.033, 
+    mleft=3, 
+    mright=3, 
+    mtop=1, 
+    mbottom=1)
+AT (0, 0, 0.217) RELATIVE PREVIOUS
+
+// chopper 1 here.
+
+// distance 12 + 33
+COMPONENT between_chopper1_and_2 = Guide_gravity(
+    w1=0.05, 
+    h1=0.02, 
+    l=0.09,
+    mleft=3, 
+    mright=3, 
+    mtop=1, 
+    mbottom=1
+)
+AT (0, 0, 0.045) RELATIVE PREVIOUS
+
+
+// chopper 2 here
+
+// this is actually 3 separate pieces of guide, 3.3 + 16.8 + 3.3, each separated by 1 mm
+// distance 90+12
+COMPONENT between_chopper2_and_3 = Guide_gravity(
+    w1=0.05, 
+    h1=0.02, 
+    l=0.236,
+    mleft=3, 
+    mright=3, 
+    mtop=1, 
+    mbottom=1
+)
+AT (0, 0, 0.102) RELATIVE PREVIOUS
+
+
+// chopper 3 here.
+
+// this is actually 3 separate pieces of guide, 3.3 + 36.8 + 3.3, each separated by 1 mm
+// distance 236 + 12 = 248
+COMPONENT between_chopper3_and_4 = Guide_gravity(
+    w1=0.05, 
+    h1=0.02, 
+    l=0.434,
+    mleft=3, 
+    mright=3, 
+    mtop=1, 
+    mbottom=1
+)
+AT (0, 0, 0.248) RELATIVE PREVIOUS
+
+
+// chopper 4 here
+
+// this is actually 2 separate pieces of guide, 3.3 + 99.8, each separated by 1 mm
+// distance 434+12
+COMPONENT after4 = Guide_gravity(
+    w1=0.05, 
+    h1=0.02, 
+    l=1.032,
+    mleft=3, 
+    mright=3, 
+    mtop=1, 
+    mbottom=1
+)
+AT (0, 0, 0.446) RELATIVE PREVIOUS
+
+
+// roughly 60 mm after end of guide
+// TODO check distance
+// 33 + 998 + 1 + 60
+COMPONENT slit2 = Slit(
+    xwidth=0.05, 
+    yheight=ss2vg/1000.0)
+AT (0, 0, 1.092) RELATIVE PREVIOUS
+
+
+
+// centred at 991 mm from slit2
+COMPONENT guide_gravity = Guide_gravity(
+    w1=0.05,
+    h1=0.1, 
+    w2=foc/1000.0, 
+    h2=0.1, 
+    l=1.2, 
+    mleft=guide_m, 
+    mright=guide_m, 
+    mtop=0, 
+    mbottom=0)
+AT (0, 0, 0.391) RELATIVE PREVIOUS
+
+
+COMPONENT slit3 = Slit(
+    xwidth=sample_width/1000.0, 
+    yheight=ss3vg/1000.0)
+AT (0, 0, S23/1000.0 - 0.391 ) RELATIVE PREVIOUS
+
+
+COMPONENT sample = Slit(
+    xwidth=(sample_width)/1000.0, 
+    yheight=0.01)
+AT (0, 0, 0.1) RELATIVE slit3
+
+
+COMPONENT psdlin_monitor = PSDlin_monitor(
+    nx=101, 
+    filename="xpos", 
+    xwidth=0.32,
+    yheight=0.1,
+    restore_neutron=1)
+AT (0, 0, 2.512) RELATIVE PREVIOUS
+
+
+COMPONENT l_monitor = L_monitor(
+    nL=36, 
+    xwidth=0.32,
+    yheight=0.1, 
+    Lmin=2.25, 
+    Lmax=20.25,
+    filename="det"
+)
+AT (0, 0, 0) RELATIVE PREVIOUS
+
+
+FINALLY
+%{
+%}
+
+END
