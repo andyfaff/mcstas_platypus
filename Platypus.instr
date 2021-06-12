@@ -109,11 +109,11 @@ AT (0, 0, 0.217) RELATIVE PREVIOUS
 
 // chopper 1.
 // When nu is positive the choppers are spinning clockwise looking from the detector to the source.
-// When you set a positive phase the choppers are shifted anticlockwise.
+// When you set a positive phase the choppers are shifted anticlockwise, T0 is shifted to earlier in the window.
 // this corresponds to the choppers going UP through the beam on PLP.
 
 // When nu is negative the choppers are spinning anticlockwise looking from the detector to the source.
-// When you set a positive phase the choppers are shifted clockwise.
+// When you set a positive phase the choppers are shifted clockwise, T0 is shifted to earlier in the window.
 // this corresponds to the choppers going DOWN through the beam on PLP.
 
 // beam centre is 320mm to middle. Beam should be centred on
@@ -126,8 +126,8 @@ COMPONENT chopper1 = DiskChopper(
     nslit=1, 
     isfirst=1, 
     phase=-30)
-AT (0, 0, 0.039) RELATIVE PREVIOUS
-ROTATED (0, 0, 90) ABSOLUTE 
+AT (0, 0, 0.256) RELATIVE slit1
+ROTATED (0, 0, 90) ABSOLUTE
 
 
 // distance 12 + 33
@@ -145,6 +145,20 @@ ROTATED (0, 0, 0) ABSOLUTE
 
 
 // chopper 2 here
+// positive nu means rotating clockwise when looking down beamline.
+// positive phase means rotate clockwise.
+// beam centre is 320mm to middle. Beam should be centred on
+// half cutout height, i.e. radius - 0.5 * yheight
+COMPONENT chopper2 = DiskChopper(
+    theta_0=10, 
+    radius=0.35, 
+    yheight=0.06, 
+    nu=0, 
+    nslit=1, 
+    phase=0)
+AT (0, 0, 0.103) RELATIVE chopper1
+ROTATED (0, 0, 90) ABSOLUTE 
+
 
 // this is actually 3 separate pieces of guide, 3.3 + 16.8 + 3.3, each separated by 1 mm
 // distance 90+12
@@ -157,11 +171,11 @@ COMPONENT between_chopper2_and_3 = Guide_gravity(
     mtop=1, 
     mbottom=1
 )
-AT (0, 0, 0.102) RELATIVE PREVIOUS
+AT (0, 0, 0.006) RELATIVE PREVIOUS
+ROTATED (0, 0, 0) ABSOLUTE 
 
 
 // chopper 3 here.
-// chopper 1.
 // positive nu means rotating clockwise when looking down beamline.
 // positive phase means rotate clockwise.
 // beam centre is 320mm to middle. Beam should be centred on
@@ -173,7 +187,7 @@ COMPONENT chopper3 = DiskChopper(
     nu=-24, 
     nslit=1, 
     phase=12.5)
-AT (0, 0, 0.242) RELATIVE PREVIOUS
+AT (0, 0, 0.358) RELATIVE chopper1
 ROTATED (0, 0, 90) ABSOLUTE 
 
 
@@ -193,6 +207,20 @@ ROTATED (0, 0, 0) ABSOLUTE
 
 
 // chopper 4 here
+// positive nu means rotating clockwise when looking down beamline.
+// positive phase means rotate clockwise.
+// beam centre is 320mm to middle. Beam should be centred on
+// half cutout height, i.e. radius - 0.5 * yheight
+COMPONENT chopper4 = DiskChopper(
+    theta_0=60, 
+    radius=0.35, 
+    yheight=0.06, 
+    nu=0, 
+    nslit=1, 
+    phase=0)
+AT (0, 0, 0.808) RELATIVE chopper1
+ROTATED (0, 0, 90) ABSOLUTE 
+
 
 // this is actually 2 separate pieces of guide, 3.3 + 99.8, each separated by 1 mm
 // distance 434+12
@@ -205,7 +233,8 @@ COMPONENT after4 = Guide_gravity(
     mtop=1, 
     mbottom=1
 )
-AT (0, 0, 0.446) RELATIVE PREVIOUS
+AT (0, 0, 0.006) RELATIVE PREVIOUS
+ROTATED (0, 0, 0) ABSOLUTE 
 
 
 // roughly 60 mm after end of guide
@@ -214,8 +243,8 @@ AT (0, 0, 0.446) RELATIVE PREVIOUS
 COMPONENT slit2 = Slit(
     xwidth=0.05, 
     yheight=ss2vg/1000.0)
-AT (0, 0, 1.092) RELATIVE PREVIOUS
-
+AT (0, 0, 1.909) RELATIVE chopper1
+ROTATED (0, 0, 0) ABSOLUTE 
 
 
 // centred at 991 mm from slit2
@@ -241,7 +270,8 @@ AT (0, 0, S23/1000.0 - 0.391 ) RELATIVE PREVIOUS
 COMPONENT sample = Slit(
     xwidth=(sample_width)/1000.0, 
     yheight=0.01)
-AT (0, 0, 0.1) RELATIVE slit3
+AT (0, 0, 5.0454) RELATIVE chopper1
+ROTATED (0, 0, 0) ABSOLUTE 
 
 
 COMPONENT psdlin_monitor = PSDlin_monitor(
