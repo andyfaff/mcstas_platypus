@@ -5,32 +5,43 @@
 * Written by: Andrew Nelson (andrew.nelson@ansto.gov.au)>
 * Date: 10/6/2021
 * Origin: ANSTO
-* %INSTRUMENT_SITE: Templates
+* %INSTRUMENT_SITE: ANSTO
 *
-* <instrument short description>
+* The PLATYPUS instrument at ANSTO
 *
-* %D
-* <instrument description>
+* %Description
+* The PLATYPUS TOF reflectometer at ANSTO
 *
 * Example: <parameters=values>
 *
-* %P
-* <parameter1>: [<unit>] <parameter1 description>
-* ...
+* %Parameters
+* use_choppers: [1] whether to use choppers or not
+* frequency: [Hz] the chopper frequency. negative means chopping down through the beam, 
+	positive up through beam.
+* double ss1vg: [mm] height of slit1 gap
+* double ss2vg: [mm] height of slit2 gap
+* double ss3vg: [mm] height of slit3 gap
+* double S23: [mm] slit2 to slit3 distance
+* double ss1hg: [mm] height of slit1 gap
+* double ss2hg: [mm] height of slit2 gap
+* double ss3hg: [mm] height of slit3 gap
+* sample_width: [mm] width of sample
+
+
 *
 * %L
 * <reference/HTML link>
 *
 * %E
 *******************************************************************************/
-DEFINE INSTRUMENT PLATYPUS_ANSTO(double sample_width=20, double foc=30.0, double guide_m=4.0, int use_choppers=1)
+DEFINE INSTRUMENT PLATYPUS_ANSTO(double foc_exit=30.0, double guide_m=4.0,
+int use_choppers=1, double frequency=-24, double ss1vg=20.0, double ss2vg=8.955, double ss3vg=0.5, double S23 = 3036.0, double ss1hg=50.0,
+double ss2hg=50,  double ss3hg=20, double sample_width=20.0)
 
 DECLARE
 %{
-double ss1vg = 20.0;
-double ss2vg = 8.955;
-double ss3vg = 8.0;
-double S23 = 3036.0;
+
+
 %}
 
 INITIALIZE
@@ -85,7 +96,7 @@ AT (0, 0, 2.530) RELATIVE PREVIOUS
 // But it's 256 mm before chopper 1
 // roughly 50 mm after end of FOM
 COMPONENT slit1 = Slit(
-    xwidth=0.05, 
+    xwidth=ss1hg/1000.0, 
     yheight=ss1vg/1000.0)
 AT (0, 0, 0.617) RELATIVE PREVIOUS
 
@@ -125,7 +136,7 @@ COMPONENT chopper1 = DiskChopper(
     theta_0=60, 
     radius=0.35, 
     yheight=0.06, 
-    nu=-24, 
+    nu=frequency, 
     nslit=1, 
     isfirst=1, 
     phase=-30)
@@ -187,7 +198,7 @@ COMPONENT chopper3 = DiskChopper(
     theta_0=25, 
     radius=0.35, 
     yheight=0.06, 
-    nu=-24, 
+    nu=frequency, 
     nslit=1, 
     phase=12.5)
 WHEN(use_choppers) AT (0, 0, 0.356) RELATIVE arm
@@ -243,28 +254,27 @@ ROTATED (0, 0, 0) ABSOLUTE
 // roughly 60 mm after end of guide
 // distance calculated by FARO
 COMPONENT slit2 = Slit(
-    xwidth=0.05, 
-    yheight=ss2vg/1000.0)
+    xwidth=ss2hg / 1000.0, 
+    yheight=ss2vg / 1000.0)
 AT (0, 0, 1.909) RELATIVE arm
-ROTATED (0, 0, 0) ABSOLUTE 
 
 
 // centred at 991 mm from slit2
-COMPONENT guide_gravity = Guide_gravity(
+COMPONENT FOC_mirror = Guide_gravity(
     w1=0.05,
     h1=0.1, 
-    w2=foc/1000.0, 
+    w2=foc_exit/1000.0, 
     h2=0.1, 
     l=1.2, 
     mleft=guide_m, 
     mright=guide_m, 
-    mtop=0, 
+    mtop=0,
     mbottom=0)
 AT (0, 0, 0.391) RELATIVE PREVIOUS
 
 
 COMPONENT slit3 = Slit(
-    xwidth=sample_width / 1000.0, 
+    xwidth=ss3hg / 1000.0, 
     yheight=ss3vg/1000.0)
 AT (0, 0, S23/1000.0 - 0.391 ) RELATIVE PREVIOUS
 
@@ -274,7 +284,6 @@ COMPONENT sample = Slit(
     xwidth=(sample_width) / 1000.0, 
     yheight=0.01)
 AT (0, 0, 5.0447) RELATIVE arm
-ROTATED (0, 0, 0) ABSOLUTE 
 
 
 COMPONENT psdlin_monitor = PSDlin_monitor(
@@ -283,7 +292,7 @@ COMPONENT psdlin_monitor = PSDlin_monitor(
     xwidth=0.32,
     yheight=0.1,
     restore_neutron=1)
-AT (0, 0, 2.512) RELATIVE PREVIOUS
+AT (0, 0, 2.512) RELATIVE sample
 
 
 COMPONENT l_monitor = L_monitor(
@@ -294,7 +303,7 @@ COMPONENT l_monitor = L_monitor(
     Lmax=20.25,
     filename="det"
 )
-AT (0, 0, 0) RELATIVE PREVIOUS
+AT (0, 0, 2.512) RELATIVE sample
 
 
 FINALLY
