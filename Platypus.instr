@@ -23,7 +23,7 @@
 *
 * %E
 *******************************************************************************/
-DEFINE INSTRUMENT template_simple(double sample_width=20, double foc=30.0, double guide_m=4.0)
+DEFINE INSTRUMENT PLATYPUS_ANSTO(double sample_width=20, double foc=30.0, double guide_m=4.0, int use_choppers=1)
 
 DECLARE
 %{
@@ -43,8 +43,6 @@ COMPONENT origin = Progress_bar()
 AT (0, 0, 0) RELATIVE ABSOLUTE
 
 // CHECK DISTANCES OF SLIT1 from end of FOM
-// CHECK DISTANCE OF Slit2 from end of post chopper 4 guide
-// CHECK disk chopper settings
 
 COMPONENT source_div = Source_div(
     xwidth=0.05, 
@@ -106,6 +104,11 @@ COMPONENT prechopper1 = Guide_gravity(
     mbottom=1)
 AT (0, 0, 0.217) RELATIVE PREVIOUS
 
+// this is where all distances are measured from
+// it corresponds to chopper1 location
+COMPONENT arm = Arm()
+AT (0, 0, 0.256) RELATIVE slit1
+
 
 // chopper 1.
 // When nu is positive the choppers are spinning clockwise looking from the detector to the source.
@@ -126,11 +129,11 @@ COMPONENT chopper1 = DiskChopper(
     nslit=1, 
     isfirst=1, 
     phase=-30)
-AT (0, 0, 0.256) RELATIVE slit1
+WHEN(use_choppers) AT (0, 0, 0.0) RELATIVE PREVIOUS
 ROTATED (0, 0, 90) ABSOLUTE
 
 
-// distance 12 + 33
+// distance set to 5mm after chopper distance
 COMPONENT between_chopper1_and_2 = Guide_gravity(
     w1=0.05, 
     h1=0.02, 
@@ -140,7 +143,7 @@ COMPONENT between_chopper1_and_2 = Guide_gravity(
     mtop=1, 
     mbottom=1
 )
-AT (0, 0, 0.006) RELATIVE PREVIOUS
+AT (0, 0, 0.005) RELATIVE arm
 ROTATED (0, 0, 0) ABSOLUTE 
 
 
@@ -156,12 +159,12 @@ COMPONENT chopper2 = DiskChopper(
     nu=0, 
     nslit=1, 
     phase=0)
-AT (0, 0, 0.103) RELATIVE chopper1
+WHEN(use_choppers) AT (0, 0, 0.103) RELATIVE arm
 ROTATED (0, 0, 90) ABSOLUTE 
 
 
 // this is actually 3 separate pieces of guide, 3.3 + 16.8 + 3.3, each separated by 1 mm
-// distance 90+12
+// distance set to 5mm after chopper distance
 COMPONENT between_chopper2_and_3 = Guide_gravity(
     w1=0.05, 
     h1=0.02, 
@@ -171,7 +174,7 @@ COMPONENT between_chopper2_and_3 = Guide_gravity(
     mtop=1, 
     mbottom=1
 )
-AT (0, 0, 0.006) RELATIVE PREVIOUS
+AT (0, 0, 0.108) RELATIVE arm
 ROTATED (0, 0, 0) ABSOLUTE 
 
 
@@ -187,12 +190,12 @@ COMPONENT chopper3 = DiskChopper(
     nu=-24, 
     nslit=1, 
     phase=12.5)
-AT (0, 0, 0.358) RELATIVE chopper1
+WHEN(use_choppers) AT (0, 0, 0.356) RELATIVE arm
 ROTATED (0, 0, 90) ABSOLUTE 
 
 
 // this is actually 3 separate pieces of guide, 3.3 + 36.8 + 3.3, each separated by 1 mm
-// distance 236 + 12 = 248
+// distance set to 5mm after chopper distance
 COMPONENT between_chopper3_and_4 = Guide_gravity(
     w1=0.05, 
     h1=0.02, 
@@ -202,7 +205,7 @@ COMPONENT between_chopper3_and_4 = Guide_gravity(
     mtop=1, 
     mbottom=1
 )
-AT (0, 0, 0.006) RELATIVE PREVIOUS
+AT (0, 0, 0.361) RELATIVE arm
 ROTATED (0, 0, 0) ABSOLUTE 
 
 
@@ -218,12 +221,12 @@ COMPONENT chopper4 = DiskChopper(
     nu=0, 
     nslit=1, 
     phase=0)
-AT (0, 0, 0.808) RELATIVE chopper1
+WHEN(use_choppers) AT (0, 0, 0.8058) RELATIVE arm
 ROTATED (0, 0, 90) ABSOLUTE 
 
 
 // this is actually 2 separate pieces of guide, 3.3 + 99.8, each separated by 1 mm
-// distance 434+12
+// distance set to 5mm after chopper distance
 COMPONENT after4 = Guide_gravity(
     w1=0.05, 
     h1=0.02, 
@@ -233,17 +236,16 @@ COMPONENT after4 = Guide_gravity(
     mtop=1, 
     mbottom=1
 )
-AT (0, 0, 0.006) RELATIVE PREVIOUS
+AT (0, 0, 0.8108) RELATIVE arm
 ROTATED (0, 0, 0) ABSOLUTE 
 
 
 // roughly 60 mm after end of guide
-// TODO check distance
-// 33 + 998 + 1 + 60
+// distance calculated by FARO
 COMPONENT slit2 = Slit(
     xwidth=0.05, 
     yheight=ss2vg/1000.0)
-AT (0, 0, 1.909) RELATIVE chopper1
+AT (0, 0, 1.909) RELATIVE arm
 ROTATED (0, 0, 0) ABSOLUTE 
 
 
@@ -262,15 +264,16 @@ AT (0, 0, 0.391) RELATIVE PREVIOUS
 
 
 COMPONENT slit3 = Slit(
-    xwidth=sample_width/1000.0, 
+    xwidth=sample_width / 1000.0, 
     yheight=ss3vg/1000.0)
 AT (0, 0, S23/1000.0 - 0.391 ) RELATIVE PREVIOUS
 
 
+// distance calculated by FARO
 COMPONENT sample = Slit(
-    xwidth=(sample_width)/1000.0, 
+    xwidth=(sample_width) / 1000.0, 
     yheight=0.01)
-AT (0, 0, 5.0454) RELATIVE chopper1
+AT (0, 0, 5.0447) RELATIVE arm
 ROTATED (0, 0, 0) ABSOLUTE 
 
 
