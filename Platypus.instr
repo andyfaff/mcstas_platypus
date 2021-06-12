@@ -108,20 +108,27 @@ AT (0, 0, 0.217) RELATIVE PREVIOUS
 
 
 // chopper 1.
-// positive nu means rotating clockwise when looking down beamline.
-// positive phase means rotate anticlockwise.
+// When nu is positive the choppers are spinning clockwise looking from the detector to the source.
+// When you set a positive phase the choppers are shifted anticlockwise.
+// this corresponds to the choppers going UP through the beam on PLP.
+
+// When nu is negative the choppers are spinning anticlockwise looking from the detector to the source.
+// When you set a positive phase the choppers are shifted clockwise.
+// this corresponds to the choppers going DOWN through the beam on PLP.
+
 // beam centre is 320mm to middle. Beam should be centred on
 // half cutout height, i.e. radius - 0.5 * yheight
 COMPONENT chopper1 = DiskChopper(
     theta_0=60, 
     radius=0.35, 
     yheight=0.06, 
-    nu=24, 
+    nu=-24, 
     nslit=1, 
     isfirst=1, 
-    phase=90)
+    phase=-30)
 AT (0, 0, 0.039) RELATIVE PREVIOUS
 ROTATED (0, 0, 90) ABSOLUTE 
+
 
 // distance 12 + 33
 COMPONENT between_chopper1_and_2 = Guide_gravity(
@@ -163,7 +170,7 @@ COMPONENT chopper3 = DiskChopper(
     theta_0=25, 
     radius=0.35, 
     yheight=0.06, 
-    nu=24, 
+    nu=-24, 
     nslit=1, 
     phase=12.5)
 AT (0, 0, 0.242) RELATIVE PREVIOUS
