@@ -35,17 +35,47 @@
 * %E
 *******************************************************************************/
 DEFINE INSTRUMENT PLATYPUS_ANSTO(double foc_exit=30.0, double guide_m=4.0,
-int use_choppers=1, double frequency=-24, double ss1vg=20.0, double ss2vg=8.955, double ss3vg=0.5, double S23 = 3036.0, double ss1hg=50.0,
+int use_choppers=1,  double frequency=-24.0, int following_chopper=3, double phase_opening=0.0,
+double ss1vg=20.0, double ss2vg=8.955, double ss3vg=0.5, double S23=3036.0, double ss1hg=50.0,
 double ss2hg=50,  double ss3hg=20, double sample_width=20.0)
 
 DECLARE
 %{
 
-
+double chspeeds[4];
+double chphases[4];
+double sign = 1;
 %}
 
 INITIALIZE
 %{
+memset(chspeeds, 0, sizeof(double) * 4);
+memset(chphases, 0, sizeof(double) * 4);
+
+if(use_choppers){
+	chspeeds[0] = frequency;
+	if(frequency < 0){
+		sign = 1;
+		chphases[0] = -30;
+	} else {
+		sign = -1;
+		chphases[0] = 30;
+	}
+	switch(following_chopper){
+		case 2:
+		    chspeeds[1] = frequency;
+		    chphases[1] = (5.0 - phase_opening) * sign;
+		    break;
+		case 3:
+		     chspeeds[2] = frequency;
+		    chphases[2] = (12.5 - phase_opening) * sign;
+		     break;
+		case 4:
+                    chspeeds[3] = frequency;
+                    chspeeds[3] = (30.0 - phase_opening) * sign;
+		    break;
+	}
+}
 %}
 
 TRACE
@@ -140,10 +170,10 @@ COMPONENT chopper1 = DiskChopper(
     theta_0=60, 
     radius=0.35, 
     yheight=0.06, 
-    nu=frequency, 
+    nu=chspeeds[0], 
     nslit=1, 
     isfirst=1, 
-    phase=-30)
+    phase=chphases[0])
 WHEN(use_choppers) AT (0, 0, 0.0) RELATIVE arm
 ROTATED (0, 0, 90) ABSOLUTE
 
@@ -171,9 +201,9 @@ COMPONENT chopper2 = DiskChopper(
     theta_0=10, 
     radius=0.35, 
     yheight=0.06, 
-    nu=0, 
+    nu=chspeeds[1], 
     nslit=1, 
-    phase=0)
+    phase=chphases[1])
 WHEN(use_choppers) AT (0, 0, 0.103) RELATIVE arm
 ROTATED (0, 0, 90) ABSOLUTE 
 
@@ -202,9 +232,9 @@ COMPONENT chopper3 = DiskChopper(
     theta_0=25, 
     radius=0.35, 
     yheight=0.06, 
-    nu=frequency, 
+    nu=chspeeds[2], 
     nslit=1, 
-    phase=12.5)
+    phase=chphases[2])
 WHEN(use_choppers) AT (0, 0, 0.356) RELATIVE arm
 ROTATED (0, 0, 90) ABSOLUTE 
 
@@ -233,9 +263,9 @@ COMPONENT chopper4 = DiskChopper(
     theta_0=60, 
     radius=0.35, 
     yheight=0.06, 
-    nu=0, 
+    nu=chspeeds[3], 
     nslit=1, 
-    phase=0)
+    phase=chphases[3])
 WHEN(use_choppers) AT (0, 0, 0.8058) RELATIVE arm
 ROTATED (0, 0, 90) ABSOLUTE 
 
