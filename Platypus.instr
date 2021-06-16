@@ -132,6 +132,10 @@ AT (0, 0, 0.256) RELATIVE slit1
 
 // beam centre is 320mm to middle. Beam should be centred on
 // half cutout height, i.e. radius - 0.5 * yheight
+
+// chopper relative chopper phasings have been verified for 2Å neutrons (@ -24Hz) by placing a TOF
+// monitor directly after slit3 and checking that the flight time corresponds to half the distance between
+// chopper 1 and 3.
 COMPONENT chopper1 = DiskChopper(
     theta_0=60, 
     radius=0.35, 
@@ -140,7 +144,7 @@ COMPONENT chopper1 = DiskChopper(
     nslit=1, 
     isfirst=1, 
     phase=-30)
-WHEN(use_choppers) AT (0, 0, 0.0) RELATIVE PREVIOUS
+WHEN(use_choppers) AT (0, 0, 0.0) RELATIVE arm
 ROTATED (0, 0, 90) ABSOLUTE
 
 
