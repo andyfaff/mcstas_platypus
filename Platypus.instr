@@ -16,8 +16,12 @@
 *
 * %Parameters
 * use_choppers: [1] whether to use choppers or not
-* frequency: [Hz] the chopper frequency. negative means chopping down through the beam, 
+* frequency: [Hz] the chopper frequency, negative means chopping down through the beam, 
 	positive up through beam.
+* int following_chopper: [1] specifies the following chopper,  {2, 3, 4}
+* double phase_opening: [deg] phase opening of following chopper relative to the main chopper.
+    Normal mode of operation is to have the phase_opening=0, but a small phase opening leads
+    to a large increase in short wavelengths.   
 * double ss1vg: [mm] height of slit1 gap
 * double ss2vg: [mm] height of slit2 gap
 * double ss3vg: [mm] height of slit3 gap
