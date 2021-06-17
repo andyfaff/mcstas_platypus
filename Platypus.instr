@@ -310,7 +310,7 @@ AT (0, 0, 0.391) RELATIVE PREVIOUS
 COMPONENT slit3 = Slit(
     xwidth=ss3hg / 1000.0, 
     yheight=ss3vg/1000.0)
-AT (0, 0, S23/1000.0 - 0.391 ) RELATIVE PREVIOUS
+AT (0, 0, S23/1000.0) RELATIVE slit2
 
 
 // distance calculated by FARO
