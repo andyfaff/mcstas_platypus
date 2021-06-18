@@ -1,0 +1,265 @@
+/*******************************************************************************
+* Instrument: <instrument name>
+*
+* %I
+* Written by: Andrew Nelson
+* Date: 18/6/2021
+* Origin: ANSTO
+* %INSTRUMENT_SITE: ANSTO
+*
+* CG3 guide viewing the liquid D2 moderator
+*
+* %D
+* <instrument description>
+*
+* Example: <parameters=values>
+*
+* %P
+* <parameter1>: [<unit>] <parameter1 description>
+* ...
+*
+* %L
+* <reference/HTML link>
+*
+* %E
+*******************************************************************************/
+DEFINE INSTRUMENT ANSTO_CG3()
+
+DECLARE
+%{
+double RADIUS = 1300;
+%}
+
+INITIALIZE
+%{
+%}
+
+TRACE
+
+COMPONENT origin = Progress_bar()
+AT (0, 0, 0) RELATIVE ABSOLUTE
+
+//based off CG3_NBI2_alt.gui
+// TODO according to my existing Vitess model this is 1.5m from the moderator
+// line 3
+COMPONENT guide_line3 = Guide_gravity(
+    w1=0.05, 
+    h1=0.2, 
+    l=1.437, 
+    mleft=2, 
+    mright=2, 
+    mtop=3, 
+    mbottom=3)
+AT (0, 0, 0) RELATIVE PREVIOUS
+
+// line 5
+COMPONENT guide_line5 = Guide_gravity(
+    w1=0.05, 
+    h1=0.2, 
+    l=1.353, 
+    mleft=2, 
+    mright=2, 
+    mtop=3, 
+    mbottom=3)
+AT (0, 0, 1.44) RELATIVE PREVIOUS
+
+
+// line 8
+COMPONENT guide_line8 = Guide_gravity(
+    w1=0.05, 
+    h1=0.2, 
+    l=0.4825, 
+    mleft=2, 
+    mright=2.5, 
+    mtop=3, 
+    mbottom=3)
+AT (0, 0, 1.357) RELATIVE PREVIOUS
+
+
+// line 10
+// TODO: check distance between guide segments. Guessing at 1 mm.
+// TODO: not clear that the first guide in series is rotated.
+// TODO: USE JUMP?
+COMPONENT CG_1_start = Arm()
+AT (0, 0, 0.4881) RELATIVE PREVIOUS
+
+COMPONENT CG_1_1 = Guide_gravity(w1=0.05, h1=0.2, l=0.5, mleft=2, mright=2.5, mtop=3, mbottom=3)
+AT (0, 0, 0) RELATIVE PREVIOUS
+ROTATED (0, 0.501 / RADIUS * 180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT CG_1_2 = Guide_gravity(w1=0.05, h1=0.2, l=0.5, mleft=2, mright=2.5, mtop=3, mbottom=3)
+AT (0, 0, 0.501) RELATIVE PREVIOUS
+ROTATED (0, 0.501 / RADIUS * 180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT CG_1_3 = Guide_gravity(w1=0.05, h1=0.2, l=0.5, mleft=2, mright=2.5, mtop=3, mbottom=3)
+AT (0, 0, 0.501) RELATIVE PREVIOUS
+ROTATED (0, 0.501 / RADIUS * 180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT CG_1_4 = Guide_gravity(w1=0.05, h1=0.2, l=0.5, mleft=2, mright=2.5, mtop=3, mbottom=3)
+AT (0, 0, 0.501) RELATIVE PREVIOUS
+ROTATED (0, 0.501 / RADIUS * 180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT CG_1_5 = Guide_gravity(w1=0.05, h1=0.2, l=0.5, mleft=2, mright=2.5, mtop=3, mbottom=3)
+AT (0, 0, 0.501) RELATIVE PREVIOUS
+ROTATED (0, 0.501 / RADIUS * 180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT CG_1_6 = Guide_gravity(w1=0.05, h1=0.2, l=0.5, mleft=2, mright=2.5, mtop=3, mbottom=3)
+AT (0, 0, 0.501) RELATIVE PREVIOUS
+ROTATED (0, 0.501 / RADIUS * 180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT CG_1_7 = Guide_gravity(w1=0.05, h1=0.2, l=0.5, mleft=2, mright=2.5, mtop=3, mbottom=3)
+AT (0, 0, 0.501) RELATIVE PREVIOUS
+ROTATED (0, 0.501 / RADIUS * 180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT CG_1_8 = Guide_gravity(w1=0.05, h1=0.2, l=0.5, mleft=2, mright=2.5, mtop=3, mbottom=3)
+AT (0, 0, 0.501) RELATIVE PREVIOUS
+ROTATED (0, 0.501 / RADIUS * 180/PI, 0) RELATIVE PREVIOUS
+
+
+// line 12
+COMPONENT CG_2_start = Arm()
+AT (0, 0, 0.501) RELATIVE PREVIOUS
+
+COMPONENT CG_2_1 = Guide_gravity(w1=0.05, h1=0.2, l=0.5, mleft=2, mright=2.5, mtop=3, mbottom=3)
+AT (0, 0, 0.501) RELATIVE PREVIOUS
+ROTATED (0, 0.501 / RADIUS * 180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT CG_2_2 = Guide_gravity(w1=0.05, h1=0.2, l=0.5, mleft=2, mright=2.5, mtop=3, mbottom=3)
+AT (0, 0, 0.501) RELATIVE PREVIOUS
+ROTATED (0, 0.501 / RADIUS * 180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT CG_2_3 = Guide_gravity(w1=0.05, h1=0.2, l=0.5, mleft=2, mright=2.5, mtop=3, mbottom=3)
+AT (0, 0, 0.501) RELATIVE PREVIOUS
+ROTATED (0, 0.501 / RADIUS * 180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT CG_2_4 = Guide_gravity(w1=0.05, h1=0.2, l=0.5, mleft=2, mright=2.5, mtop=3, mbottom=3)
+AT (0, 0, 0.501) RELATIVE PREVIOUS
+ROTATED (0, 0.501 / RADIUS * 180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT CG_2_5 = Guide_gravity(w1=0.05, h1=0.2, l=0.5, mleft=2, mright=2.5, mtop=3, mbottom=3)
+AT (0, 0, 0.501) RELATIVE PREVIOUS
+ROTATED (0, 0.501 / RADIUS * 180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT CG_2_6 = Guide_gravity(w1=0.05, h1=0.2, l=0.5, mleft=2, mright=2.5, mtop=3, mbottom=3)
+AT (0, 0, 0.501) RELATIVE PREVIOUS
+ROTATED (0, 0.501 / RADIUS * 180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT CG_2_7 = Guide_gravity(w1=0.05, h1=0.2, l=0.5, mleft=2, mright=2.5, mtop=3, mbottom=3)
+AT (0, 0, 0.501) RELATIVE PREVIOUS
+ROTATED (0, 0.501 / RADIUS * 180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT CG_2_8 = Guide_gravity(w1=0.05, h1=0.2, l=0.5, mleft=2, mright=2.5, mtop=3, mbottom=3)
+AT (0, 0, 0.501) RELATIVE PREVIOUS
+ROTATED (0, 0.501 / RADIUS * 180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT CG_2_9 = Guide_gravity(w1=0.05, h1=0.2, l=0.5, mleft=2, mright=2.5, mtop=3, mbottom=3)
+AT (0, 0, 0.501) RELATIVE PREVIOUS
+ROTATED (0, 0.501 / RADIUS * 180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT CG_2_10 = Guide_gravity(w1=0.05, h1=0.2, l=0.5, mleft=2, mright=2.5, mtop=3, mbottom=3)
+AT (0, 0, 0.501) RELATIVE PREVIOUS
+ROTATED (0, 0.501 / RADIUS * 180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT CG_2_11 = Guide_gravity(w1=0.05, h1=0.2, l=0.5, mleft=2, mright=2.5, mtop=3, mbottom=3)
+AT (0, 0, 0.501) RELATIVE PREVIOUS
+ROTATED (0, 0.501 / RADIUS * 180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT CG_2_12 = Guide_gravity(w1=0.05, h1=0.2, l=0.5, mleft=2, mright=2.5, mtop=3, mbottom=3)
+AT (0, 0, 0.501) RELATIVE PREVIOUS
+ROTATED (0, 0.501 / RADIUS * 180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT CG_2_13 = Guide_gravity(w1=0.05, h1=0.2, l=0.5, mleft=2, mright=2.5, mtop=3, mbottom=3)
+AT (0, 0, 0.501) RELATIVE PREVIOUS
+ROTATED (0, 0.501 / RADIUS * 180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT CG_2_14 = Guide_gravity(w1=0.05, h1=0.2, l=0.5, mleft=2, mright=2.5, mtop=3, mbottom=3)
+AT (0, 0, 0.501) RELATIVE PREVIOUS
+ROTATED (0, 0.501 / RADIUS * 180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT CG_2_15 = Guide_gravity(w1=0.05, h1=0.2, l=0.5, mleft=2, mright=2.5, mtop=3, mbottom=3)
+AT (0, 0, 0.501) RELATIVE PREVIOUS
+ROTATED (0, 0.501 / RADIUS * 180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT CG_2_16 = Guide_gravity(w1=0.05, h1=0.2, l=0.5, mleft=2, mright=2.5, mtop=3, mbottom=3)
+AT (0, 0, 0.501) RELATIVE PREVIOUS
+ROTATED (0, 0.501 / RADIUS * 180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT CG_2_17 = Guide_gravity(w1=0.05, h1=0.2, l=0.5, mleft=2, mright=2.5, mtop=3, mbottom=3)
+AT (0, 0, 0.501) RELATIVE PREVIOUS
+ROTATED (0, 0.501 / RADIUS * 180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT CG_2_18 = Guide_gravity(w1=0.05, h1=0.2, l=0.5, mleft=2, mright=2.5, mtop=3, mbottom=3)
+AT (0, 0, 0.501) RELATIVE PREVIOUS
+ROTATED (0, 0.501 / RADIUS * 180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT CG_2_19 = Guide_gravity(w1=0.05, h1=0.2, l=0.5, mleft=2, mright=2.5, mtop=3, mbottom=3)
+AT (0, 0, 0.501) RELATIVE PREVIOUS
+ROTATED (0, 0.501 / RADIUS * 180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT CG_2_20 = Guide_gravity(w1=0.05, h1=0.2, l=0.5, mleft=2, mright=2.5, mtop=3, mbottom=3)
+AT (0, 0, 0.501) RELATIVE PREVIOUS
+ROTATED (0, 0.501 / RADIUS * 180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT CG_2_21 = Guide_gravity(w1=0.05, h1=0.2, l=0.5, mleft=2, mright=2.5, mtop=3, mbottom=3)
+AT (0, 0, 0.501) RELATIVE PREVIOUS
+ROTATED (0, 0.501 / RADIUS * 180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT CG_2_22 = Guide_gravity(w1=0.05, h1=0.2, l=0.5, mleft=2, mright=2.5, mtop=3, mbottom=3)
+AT (0, 0, 0.501) RELATIVE PREVIOUS
+ROTATED (0, 0.501 / RADIUS * 180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT CG_2_23 = Guide_gravity(w1=0.05, h1=0.2, l=0.5, mleft=2, mright=2.5, mtop=3, mbottom=3)
+AT (0, 0, 0.501) RELATIVE PREVIOUS
+ROTATED (0, 0.501 / RADIUS * 180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT CG_2_24 = Guide_gravity(w1=0.05, h1=0.2, l=0.5, mleft=2, mright=2.5, mtop=3, mbottom=3)
+AT (0, 0, 0.501) RELATIVE PREVIOUS
+ROTATED (0, 0.501 / RADIUS * 180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT CG_2_25 = Guide_gravity(w1=0.05, h1=0.2, l=0.5, mleft=2, mright=2.5, mtop=3, mbottom=3)
+AT (0, 0, 0.501) RELATIVE PREVIOUS
+ROTATED (0, 0.501 / RADIUS * 180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT CG_2_26 = Guide_gravity(w1=0.05, h1=0.2, l=0.5, mleft=2, mright=2.5, mtop=3, mbottom=3)
+AT (0, 0, 0.501) RELATIVE PREVIOUS
+ROTATED (0, 0.501 / RADIUS * 180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT CG_2_27 = Guide_gravity(w1=0.05, h1=0.2, l=0.5, mleft=2, mright=2.5, mtop=3, mbottom=3)
+AT (0, 0, 0.501) RELATIVE PREVIOUS
+ROTATED (0, 0.501 / RADIUS * 180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT CG_2_28 = Guide_gravity(w1=0.05, h1=0.2, l=0.5, mleft=2, mright=2.5, mtop=3, mbottom=3)
+AT (0, 0, 0.501) RELATIVE PREVIOUS
+ROTATED (0, 0.501 / RADIUS * 180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT CG_2_29 = Guide_gravity(w1=0.05, h1=0.2, l=0.5, mleft=2, mright=2.5, mtop=3, mbottom=3)
+AT (0, 0, 0.501) RELATIVE PREVIOUS
+ROTATED (0, 0.501 / RADIUS * 180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT CG_2_30 = Guide_gravity(w1=0.05, h1=0.2, l=0.5, mleft=2, mright=2.5, mtop=3, mbottom=3)
+AT (0, 0, 0.501) RELATIVE PREVIOUS
+ROTATED (0, 0.501 / RADIUS * 180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT CG_2_31 = Guide_gravity(w1=0.05, h1=0.2, l=0.5, mleft=2, mright=2.5, mtop=3, mbottom=3)
+AT (0, 0, 0.501) RELATIVE PREVIOUS
+ROTATED (0, 0.501 / RADIUS * 180/PI, 0) RELATIVE PREVIOUS
+
+COMPONENT CG_2_32 = Guide_gravity(w1=0.05, h1=0.2, l=0.5, mleft=2, mright=2.5, mtop=3, mbottom=3)
+AT (0, 0, 0.501) RELATIVE PREVIOUS
+ROTATED (0, 0.501 / RADIUS * 180/PI, 0) RELATIVE PREVIOUS
+
+// line 14
+// TODO: confirm that the secondary shutter is here?
+COMPONENT guide_line14 = Guide_gravity(w1=0.05, h1=0.2, l=4.2, mleft=2.5, mright=2.5, mtop=3, mbottom=3)
+AT (0, 0, 0.6) RELATIVE PREVIOUS
+
+// line 16
+// TODO: confirm that the secondary shutter is here?
+COMPONENT guide_line16 = Guide_gravity(w1=0.05, h1=0.2, l=0.9, mleft=2.5, mright=2.5, mtop=3, mbottom=3)
+AT (0, 0, 4.2037) RELATIVE PREVIOUS
+
+FINALLY
+%{
+%}
+
+END
