@@ -36,20 +36,21 @@ INITIALIZE
 
 TRACE
 
-COMPONENT origin = Progress_bar()
+COMPONENT cg3_origin = Progress_bar()
 AT (0, 0, 0) RELATIVE ABSOLUTE
 
+// TODO Add in Al windows
 // TODO: check source terms. This component uses ANSTO_cold_source3.mod,
 // and I'm unsure of the provenance.
 COMPONENT source_maxwell_3 = Source_Maxwell_3(
     yheight=0.336, 
     xwidth=0.162, 
-    Lmin=1, 
-    Lmax=25, 
+    Lmin=0.5, 
+    Lmax=40, 
     dist=1.5, 
     focus_xw=0.05, 
     focus_yh=0.2, 
-    T1=33, 
+    T1=28, 
     T2=213, 
     I1=2.95e13, 
     I2=2.66e13)
@@ -67,7 +68,8 @@ COMPONENT guide_line3 = Guide_gravity(
     mright=2, 
     mtop=3, 
     mbottom=3)
-AT (0, 0, 0) RELATIVE PREVIOUS
+AT (0, 0, 1.5) RELATIVE PREVIOUS
+
 
 // line 5
 COMPONENT guide_line5 = Guide_gravity(
@@ -265,15 +267,27 @@ COMPONENT CG_2_32 = Guide_gravity(w1=0.05, h1=0.2, l=0.5, mleft=2, mright=2.5, m
 AT (0, 0, 0.501) RELATIVE PREVIOUS
 ROTATED (0, 0.501 / RADIUS * 180/PI, 0) RELATIVE PREVIOUS
 
+
 // line 14
 // TODO: confirm that the secondary shutter is here?
 COMPONENT guide_line14 = Guide_gravity(w1=0.05, h1=0.2, l=4.2, mleft=2.5, mright=2.5, mtop=3, mbottom=3)
 AT (0, 0, 0.6) RELATIVE PREVIOUS
 
+
 // line 16
-// TODO: confirm that the secondary shutter is here?
 COMPONENT guide_line16 = Guide_gravity(w1=0.05, h1=0.2, l=0.9, mleft=2.5, mright=2.5, mtop=3, mbottom=3)
 AT (0, 0, 4.2037) RELATIVE PREVIOUS
+
+
+REMOVABLE COMPONENT l_monitor = L_monitor(
+    nL=50, 
+    filename="lambda", 
+    xwidth=0.05, 
+    yheight=0.2, 
+    Lmin=0.1, 
+    Lmax=25,
+    restore_neutron=1)
+AT (0, 0, 0.9) RELATIVE PREVIOUS
 
 FINALLY
 %{

@@ -1,0 +1,60 @@
+/*******************************************************************************
+* Instrument: <instrument name>
+*
+* %I
+* Written by: <your name (email)>
+* Date: <current date>
+* Origin: <your institution>
+* %INSTRUMENT_SITE: Templates
+*
+* <instrument short description>
+*
+* %D
+* <instrument description>
+*
+* Example: <parameters=values>
+*
+* %P
+* <parameter1>: [<unit>] <parameter1 description>
+* ...
+*
+* %L
+* <reference/HTML link>
+*
+* %E
+*******************************************************************************/
+DEFINE INSTRUMENT ANSTO_CG3_PLATYPUS()
+
+DECLARE
+%{
+%}
+
+INITIALIZE
+%{
+%}
+
+TRACE
+
+// CG3 simulation
+%include "ANSTO_CG3.instr"
+
+
+// interfaces PLATYPUS to the end of CG3 by extracting the top 20 mm.
+COMPONENT start_platypus = Arm()
+AT (0, 0.09, 0.905) RELATIVE PREVIOUS
+
+// only take top 20 mm from CG3 and create the start of Platypus
+COMPONENT extract_top_20 = Slit(
+    xwidth=0.05,
+    yheight=0.02)
+AT (0, 0, 0) RELATIVE PREVIOUS
+
+
+// The PLATYPUS instrument on CG3
+%include "ANSTO_PLATYPUS.instr"
+
+FINALLY
+%{
+%}
+
+END

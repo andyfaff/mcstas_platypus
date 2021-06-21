@@ -7,7 +7,7 @@
 * Origin: ANSTO
 * %INSTRUMENT_SITE: ANSTO
 *
-* The PLATYPUS instrument at ANSTO
+* The PLATYPUS instrument at ANSTO, sits on the CG3 guide.
 *
 * %Description
 * The PLATYPUS TOF reflectometer at ANSTO
@@ -84,10 +84,26 @@ if(use_choppers){
 
 TRACE
 
-COMPONENT origin = Progress_bar()
+
+// TODO CHECK DISTANCES OF SLIT1 from end of FOM
+// TODO Add Al windows
+
+
+REMOVABLE COMPONENT platypus_origin = Progress_bar()
 AT (0, 0, 0) RELATIVE ABSOLUTE
 
-// CHECK DISTANCES OF SLIT1 from end of FOM
+
+REMOVABLE COMPONENT start_platypus = Arm()
+AT (0, 0, 0) RELATIVE PREVIOUS
+
+
+// start_platypus is defined in ANSTO_CG3_PLATYPUS_INTERFACE
+// and is designed to extract the top 20 mm of CG3.
+// It's also defined here in case we're simulating the
+// instrument without CG3.
+COMPONENT platypus = Arm()
+AT (0, 0, 0) RELATIVE start_platypus
+
 
 REMOVABLE COMPONENT source_div = Source_div(
     xwidth=0.05, 
