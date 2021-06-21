@@ -40,7 +40,7 @@
 *******************************************************************************/
 DEFINE INSTRUMENT PLATYPUS_ANSTO(double foc_exit=30.0, double guide_m=4.0,
 int use_choppers=1,  double frequency=-24.0, int following_chopper=3, double phase_opening=0.0,
-double ss1vg=20.0, double ss2vg=8.955, double ss3vg=0.5, double S23=3036.0, double ss1hg=50.0,
+double ss1vg=15.0, double ss2vg=6.955, double ss3vg=2, double S23=3036.0, double ss1hg=50.0,
 double ss2hg=50,  double ss3hg=20, double sample_width=20.0)
 
 DECLARE
@@ -48,7 +48,6 @@ DECLARE
 
 double chspeeds[4];
 double chphases[4];
-double sign = 1;
 %}
 
 INITIALIZE
@@ -58,25 +57,20 @@ memset(chphases, 0, sizeof(double) * 4);
 
 if(use_choppers){
     chspeeds[0] = frequency;
-    if(frequency < 0){
-        sign = 1;
-        chphases[0] = -30;
-    } else {
-        sign = -1;
-        chphases[0] = 30;
-    }
+    chphases[0] = -30;
+
     switch(following_chopper){
         case 2:
             chspeeds[1] = frequency;
-            chphases[1] = (5.0 - phase_opening) * sign;
+            chphases[1] = (5.0 - phase_opening);
             break;
         case 3:
-             chspeeds[2] = frequency;
-            chphases[2] = (12.5 - phase_opening) * sign;
-             break;
+            chspeeds[2] = frequency;
+            chphases[2] = (12.5 - phase_opening);
+            break;
         case 4:
-                    chspeeds[3] = frequency;
-                    chspeeds[3] = (30.0 - phase_opening) * sign;
+            chspeeds[3] = frequency;
+            chspeeds[3] = (30.0 - phase_opening);
             break;
     }
 }
@@ -87,7 +81,6 @@ TRACE
 
 // TODO CHECK DISTANCES OF SLIT1 from end of FOM
 // TODO Add Al windows
-
 
 REMOVABLE COMPONENT platypus_origin = Progress_bar()
 AT (0, 0, 0) RELATIVE ABSOLUTE
@@ -173,19 +166,17 @@ AT (0, 0, 0.256) RELATIVE slit1
 
 // chopper 1.
 // When nu is positive the choppers are spinning clockwise looking from the detector to the source.
-// When you set a positive phase the choppers are shifted anticlockwise, T0 is shifted to earlier in the window.
 // this corresponds to the choppers going UP through the beam on PLP.
 
 // When nu is negative the choppers are spinning anticlockwise looking from the detector to the source.
-// When you set a positive phase the choppers are shifted clockwise, T0 is shifted to earlier in the window.
 // this corresponds to the choppers going DOWN through the beam on PLP.
 
 // beam centre is 320mm to middle. Beam should be centred on
 // half cutout height, i.e. radius - 0.5 * yheight
 
-// chopper relative chopper phasings have been verified for 2Å neutrons (@ -24Hz) by placing a TOF
-// monitor directly after slit3 and checking that the flight time corresponds to half the distance between
-// chopper 1 and 3.
+// chopper relative chopper phasings have been verified for 2Å neutrons (@ -24 and 24 Hz) by placing a TOF
+// monitor directly after this component and checking that the flight time corresponds to half the distance
+// between chopper 1 and 3 to the monitor.
 COMPONENT chopper1 = DiskChopper(
     theta_0=60, 
     radius=0.35, 
@@ -194,7 +185,7 @@ COMPONENT chopper1 = DiskChopper(
     nslit=1, 
     isfirst=1, 
     phase=chphases[0])
-WHEN(use_choppers) AT (0, 0, 0.0) RELATIVE arm
+WHEN(use_choppers) AT (0, 0, 0) RELATIVE arm
 ROTATED (0, 0, 90) ABSOLUTE
 
 
@@ -213,8 +204,6 @@ ROTATED (0, 0, 0) ABSOLUTE
 
 
 // chopper 2 here
-// positive nu means rotating clockwise when looking down beamline.
-// positive phase means rotate clockwise.
 // beam centre is 320mm to middle. Beam should be centred on
 // half cutout height, i.e. radius - 0.5 * yheight
 COMPONENT chopper2 = DiskChopper(
@@ -244,15 +233,14 @@ ROTATED (0, 0, 0) ABSOLUTE
 
 
 // chopper 3 here.
-// positive nu means rotating clockwise when looking down beamline.
-// positive phase means rotate clockwise.
 // beam centre is 320mm to middle. Beam should be centred on
 // half cutout height, i.e. radius - 0.5 * yheight
+
 COMPONENT chopper3 = DiskChopper(
     theta_0=25, 
     radius=0.35, 
     yheight=0.06, 
-    nu=chspeeds[2], 
+    nu=chspeeds[2],
     nslit=1, 
     phase=chphases[2])
 WHEN(use_choppers) AT (0, 0, 0.356) RELATIVE arm
@@ -275,8 +263,6 @@ ROTATED (0, 0, 0) ABSOLUTE
 
 
 // chopper 4 here
-// positive nu means rotating clockwise when looking down beamline.
-// positive phase means rotate clockwise.
 // beam centre is 320mm to middle. Beam should be centred on
 // half cutout height, i.e. radius - 0.5 * yheight
 COMPONENT chopper4 = DiskChopper(
