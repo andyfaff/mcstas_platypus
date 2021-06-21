@@ -7,7 +7,7 @@
 * Origin: ANSTO
 * %INSTRUMENT_SITE: ANSTO
 *
-* CG3 guide viewing the liquid D2 moderator
+* CG3 guide viewing the OPAL liquid D2 moderator
 *
 * %D
 * <instrument description>
@@ -57,7 +57,7 @@ COMPONENT source_maxwell_3 = Source_Maxwell_3(
 AT (0, 0, 0) RELATIVE PREVIOUS
 
 
-//based off CG3_NBI2_alt.gui
+// based off CG3_NBI2_alt.gui
 // TODO according to my existing Vitess model this is 1.5m from the moderator
 // line 3
 COMPONENT guide_line3 = Guide_gravity(

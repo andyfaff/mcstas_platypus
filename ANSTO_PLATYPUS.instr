@@ -17,7 +17,7 @@
 * %Parameters
 * use_choppers: [1] whether to use choppers or not
 * frequency: [Hz] the chopper frequency, negative means chopping down through the beam, 
-	positive up through beam.
+    positive up through beam.
 * int following_chopper: [1] specifies the following chopper,  {2, 3, 4}
 * double phase_opening: [deg] phase opening of following chopper relative to the main chopper.
     Normal mode of operation is to have the phase_opening=0, but a small phase opening leads
@@ -34,7 +34,7 @@
 
 *
 * %L
-* <reference/HTML link>
+* https://www.ansto.gov.au/our-facilities/australian-centre-for-neutron-scattering/neutron-scattering-instruments/platypus
 *
 * %E
 *******************************************************************************/
@@ -57,28 +57,28 @@ memset(chspeeds, 0, sizeof(double) * 4);
 memset(chphases, 0, sizeof(double) * 4);
 
 if(use_choppers){
-	chspeeds[0] = frequency;
-	if(frequency < 0){
-		sign = 1;
-		chphases[0] = -30;
-	} else {
-		sign = -1;
-		chphases[0] = 30;
-	}
-	switch(following_chopper){
-		case 2:
-		    chspeeds[1] = frequency;
-		    chphases[1] = (5.0 - phase_opening) * sign;
-		    break;
-		case 3:
-		     chspeeds[2] = frequency;
-		    chphases[2] = (12.5 - phase_opening) * sign;
-		     break;
-		case 4:
+    chspeeds[0] = frequency;
+    if(frequency < 0){
+        sign = 1;
+        chphases[0] = -30;
+    } else {
+        sign = -1;
+        chphases[0] = 30;
+    }
+    switch(following_chopper){
+        case 2:
+            chspeeds[1] = frequency;
+            chphases[1] = (5.0 - phase_opening) * sign;
+            break;
+        case 3:
+             chspeeds[2] = frequency;
+            chphases[2] = (12.5 - phase_opening) * sign;
+             break;
+        case 4:
                     chspeeds[3] = frequency;
                     chspeeds[3] = (30.0 - phase_opening) * sign;
-		    break;
-	}
+            break;
+    }
 }
 %}
 
@@ -97,7 +97,7 @@ REMOVABLE COMPONENT start_platypus = Arm()
 AT (0, 0, 0) RELATIVE PREVIOUS
 
 
-// start_platypus is defined in ANSTO_CG3_PLATYPUS_INTERFACE
+// start_platypus is defined in ANSTO_CG3_PLATYPUS
 // and is designed to extract the top 20 mm of CG3.
 // It's also defined here in case we're simulating the
 // instrument without CG3.
@@ -343,7 +343,7 @@ AT (0, 0, 5.0447) RELATIVE arm
 COMPONENT psdlin_monitor = PSDlin_monitor(
     nx=101, 
     filename="xpos", 
-    xwidth=0.32,
+    xwidth=0.16,
     yheight=0.1,
     restore_neutron=1)
 AT (0, 0, 2.512) RELATIVE sample
@@ -351,7 +351,7 @@ AT (0, 0, 2.512) RELATIVE sample
 
 COMPONENT l_monitor = L_monitor(
     nL=36, 
-    xwidth=0.32,
+    xwidth=0.16,
     yheight=0.1, 
     Lmin=2.25, 
     Lmax=20.25,

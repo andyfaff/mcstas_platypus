@@ -1,25 +1,39 @@
 /*******************************************************************************
-* Instrument: <instrument name>
+* Instrument: Platypus
 *
 * %I
-* Written by: <your name (email)>
-* Date: <current date>
-* Origin: <your institution>
-* %INSTRUMENT_SITE: Templates
+* Written by: Andrew Nelson (andrew.nelson@ansto.gov.au)>
+* Date: 10/6/2021
+* Origin: ANSTO
+* %INSTRUMENT_SITE: ANSTO
 *
-* <instrument short description>
+* The PLATYPUS instrument at ANSTO, sitting on the CG3 guide.
 *
-* %D
-* <instrument description>
+* %Description
+* The PLATYPUS TOF reflectometer at ANSTO
 *
 * Example: <parameters=values>
 *
-* %P
-* <parameter1>: [<unit>] <parameter1 description>
-* ...
+* %Parameters
+* use_choppers: [1] whether to use choppers or not
+* frequency: [Hz] the chopper frequency, negative means chopping down through the beam, 
+    positive up through beam.
+* int following_chopper: [1] specifies the following chopper,  {2, 3, 4}
+* double phase_opening: [deg] phase opening of following chopper relative to the main chopper.
+    Normal mode of operation is to have the phase_opening=0, but a small phase opening leads
+    to a large increase in short wavelengths.   
+* double ss1vg: [mm] height of slit1 gap
+* double ss2vg: [mm] height of slit2 gap
+* double ss3vg: [mm] height of slit3 gap
+* double S23: [mm] slit2 to slit3 distance
+* double ss1hg: [mm] height of slit1 gap
+* double ss2hg: [mm] height of slit2 gap
+* double ss3hg: [mm] height of slit3 gap
+* sample_width: [mm] width of sample
+*
 *
 * %L
-* <reference/HTML link>
+* https://www.ansto.gov.au/our-facilities/australian-centre-for-neutron-scattering/neutron-scattering-instruments/platypus
 *
 * %E
 *******************************************************************************/
@@ -42,6 +56,7 @@ TRACE
 // interfaces PLATYPUS to the end of CG3 by extracting the top 20 mm.
 COMPONENT start_platypus = Arm()
 AT (0, 0.09, 0.905) RELATIVE PREVIOUS
+
 
 // only take top 20 mm from CG3 and create the start of Platypus
 COMPONENT extract_top_20 = Slit(
