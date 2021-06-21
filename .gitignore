@@ -54,3 +54,6 @@ dkms.conf
 Platypus_*/
 Choppertest_*/
 chopper_*/
+ANSTO_CG3_PLATYPUS_*/
+ANSTO_PLATYPUS_*/
+.DS_STORE
