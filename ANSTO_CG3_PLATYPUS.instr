@@ -59,11 +59,8 @@ AT (0, 0.09, 0.905) RELATIVE PREVIOUS
 
 
 // only take top 20 mm from CG3 and create the start of Platypus
-COMPONENT extract_top_20 = Slit(
-    xwidth=0.05,
-    yheight=0.02)
-
-	AT (0, 0, 0) RELATIVE PREVIOUS
+COMPONENT extract_top_20 = Slit(xwidth=0.05, yheight=0.02)
+AT (0, 0, 0) RELATIVE PREVIOUS
 
 
 // The PLATYPUS instrument on CG3

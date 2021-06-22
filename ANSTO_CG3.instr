@@ -295,6 +295,29 @@ REMOVABLE COMPONENT l_monitor = L_monitor(
     restore_neutron=1)
 AT (0, 0, 0.9) RELATIVE PREVIOUS
 
+REMOVABLE COMPONENT psd_monitor = PSD_monitor(
+    nx=10, 
+    ny=40, 
+    filename="xc",
+    xwidth=0.05, 
+    yheight=0.02, 
+    restore_neutron=1)
+AT (0, 0.09, 0) RELATIVE PREVIOUS
+
+REMOVABLE COMPONENT psdlin_monitor = PSDlin_monitor(
+    nx=40, 
+    filename="xpos", 
+    xwidth=0.05, 
+    yheight=0.02)
+AT (0, 0, 0) RELATIVE PREVIOUS
+
+REMOVABLE COMPONENT hdiv_monitor = Hdiv_monitor(
+    nh=30,
+    filename="xdiv",
+    xwidth=0.05, 
+    yheight=0.02)
+AT (0, 0, 0) RELATIVE PREVIOUS
+
 FINALLY
 %{
 %}
