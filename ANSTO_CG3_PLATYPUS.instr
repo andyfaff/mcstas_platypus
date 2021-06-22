@@ -69,6 +69,7 @@ COMPONENT extract_top_20 = Slit(
 // The PLATYPUS instrument on CG3
 %include "ANSTO_PLATYPUS.instr"
 
+
 FINALLY
 %{
 %}

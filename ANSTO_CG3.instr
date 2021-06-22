@@ -146,7 +146,7 @@ COMPONENT CG_2_start = Arm()
 AT (0, 0, 0.501) RELATIVE PREVIOUS
 
 COMPONENT CG_2_1 = Guide_gravity(w1=0.05, h1=0.2, l=0.5, mleft=MLEFT, mright=MRIGHT, mtop=3, mbottom=3)
-AT (0, 0, 0.501) RELATIVE PREVIOUS
+AT (0, 0, 0.0) RELATIVE PREVIOUS
 ROTATED (0, 0.501 / RADIUS * 180/PI, 0) RELATIVE PREVIOUS
 
 COMPONENT CG_2_2 = Guide_gravity(w1=0.05, h1=0.2, l=0.5, mleft=MLEFT, mright=MRIGHT, mtop=3, mbottom=3)
