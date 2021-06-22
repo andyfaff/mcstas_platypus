@@ -23,7 +23,7 @@
 *
 * %E
 *******************************************************************************/
-DEFINE INSTRUMENT ANSTO_CG3()
+DEFINE INSTRUMENT ANSTO_CG3(double lambda0=11.0, dlambda=10.0)
 
 DECLARE
 %{
@@ -45,8 +45,8 @@ AT (0, 0, 0) RELATIVE ABSOLUTE
 COMPONENT source_maxwell_3 = Source_Maxwell_3(
     yheight=0.336, 
     xwidth=0.162, 
-    Lmin=0.5, 
-    Lmax=40, 
+    Lmin=lambda0 - dlambda, 
+    Lmax=lambda0 + dlambda, 
     dist=1.5, 
     focus_xw=0.05, 
     focus_yh=0.2, 
