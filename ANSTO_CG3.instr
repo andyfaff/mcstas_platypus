@@ -48,8 +48,8 @@ AT (0, 0, 0) RELATIVE ABSOLUTE
 
 COMPONENT source_maxwell_3 = Source_Maxwell_3(
     yheight=0.336, 
-    xwidth=0.162, 
-    Lmin=lambda0 - dlambda, 
+    xwidth=0.162,
+    Lmin=lambda0 - dlambda,
     Lmax=lambda0 + dlambda, 
     dist=1.5, 
     focus_xw=0.05, 
@@ -167,7 +167,7 @@ COMPONENT CG_2_6 = Guide_gravity(w1=0.05, h1=0.2, l=0.5, mleft=MLEFT, mright=MRI
 AT (0, 0, 0.501) RELATIVE PREVIOUS
 ROTATED (0, 0.501 / RADIUS * 180/PI, 0) RELATIVE PREVIOUS
 
-COMPONENT CG_2_7 = Guide_gravity(w1=0.05, h1=0.2, l=0.5, mleft=MLEFT, mright=MRIGHT mtop=3, mbottom=3)
+COMPONENT CG_2_7 = Guide_gravity(w1=0.05, h1=0.2, l=0.5, mleft=MLEFT, mright=MRIGHT, mtop=3, mbottom=3)
 AT (0, 0, 0.501) RELATIVE PREVIOUS
 ROTATED (0, 0.501 / RADIUS * 180/PI, 0) RELATIVE PREVIOUS
 
