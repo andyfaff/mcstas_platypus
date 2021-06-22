@@ -8,6 +8,7 @@ Changes
 - add polarising mirror; not specified reflectivities yet, so not yet operational
 - add lambda0 and dlambda to parameter list
 - can select between FOC and POL
+- parameterise m-coatings for L/R on CG3
 
 20210621
 --------
