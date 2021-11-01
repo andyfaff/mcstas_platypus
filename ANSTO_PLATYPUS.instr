@@ -44,7 +44,7 @@
 * %E
 *******************************************************************************/
 DEFINE INSTRUMENT PLATYPUS_ANSTO(double lambda0=11.0, dlambda=10.0, string mode="FOC",
-double foc_exit=30.0, double guide_m=4.0, int use_choppers=1,  double frequency=-24.0,
+double foc_exit=40.0, double guide_m=4.0, int use_choppers=1,  double frequency=-24.0,
 int following_chopper=3, double phase_opening=0.0, double ss1vg=15.0, double ss2vg=6.955,
 double ss3vg=2, double S23=3036.0, double ss1hg=50.0, double ss2hg=50,  double ss3hg=20, 
 double sample_width=20.0)
