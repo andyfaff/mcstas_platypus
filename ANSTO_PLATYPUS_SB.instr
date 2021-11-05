@@ -1,0 +1,392 @@
+/*******************************************************************************
+* Instrument: Platypus
+*
+* %I
+* Written by: Andrew Nelson (andrew.nelson@ansto.gov.au)>
+* Date: 10/6/2021
+* Origin: ANSTO
+* %INSTRUMENT_SITE: ANSTO
+*
+* The PLATYPUS instrument at ANSTO, sits on the CG3 guide.
+*
+* %Description
+* The PLATYPUS TOF reflectometer at ANSTO
+*
+* Example: <parameters=values>
+*
+* %Parameters
+* double lambda0: [A] mean wavelength
+* double dlambda: [A] Half width of uniform wavelength distribution
+* double guide_m: m coating of focussing guide sides
+* use_choppers: [1] whether to use choppers or not
+* frequency: [Hz] the chopper frequency, negative means chopping down through the beam, 
+    positive up through beam
+* int following_chopper: [1] specifies the following chopper,  {2, 3, 4}
+* double phase_opening: [deg] phase opening of following chopper relative to the main chopper.
+    Normal mode of operation is to have the phase_opening=0, but a small phase opening leads
+    to a large increase in short wavelengths.   
+* double ss1vg: [mm] height of slit1 gap
+* double ss2vg: [mm] height of slit2 gap
+* double ss3vg: [mm] height of slit3 gap
+* double S23: [mm] slit2 to slit3 distance
+* double ss1hg: [mm] height of slit1 gap
+* double ss2hg: [mm] height of slit2 gap
+* double ss3hg: [mm] height of slit3 gap
+* sample_width: [mm] width of sample
+
+
+*
+* %L
+* https://www.ansto.gov.au/our-facilities/australian-centre-for-neutron-scattering/neutron-scattering-instruments/platypus
+*
+* %E
+*******************************************************************************/
+DEFINE INSTRUMENT PLATYPUS_ANSTO(double lambda0=11.0, dlambda=10.0, double guide_m=4.0,
+int use_choppers=1,  double frequency=-24.0,
+int following_chopper=3, double phase_opening=0.0, double ss1vg=15.0, double ss2vg=6.955,
+double ss3vg=2, double S23=3036.0, double ss1hg=50.0, double ss2hg=50,  double ss3hg=20, 
+double sample_width=20.0, double ang=0.0)
+
+DECLARE
+%{
+
+double chspeeds[4];
+double chphases[4];
+double SB_S3;
+double SB_SZ;
+double st3vt;
+double st4vt;
+double sz;
+double sz_dz;
+double Y_MIRROR_ADJUST;
+double Z_MIRROR_ADJUST;
+%}
+
+INITIALIZE
+%{
+memset(chspeeds, 0, sizeof(double) * 4);
+memset(chphases, 0, sizeof(double) * 4);
+
+if(use_choppers){
+    chspeeds[0] = frequency;
+    chphases[0] = -30;
+
+    switch(following_chopper){
+        case 2:
+            chspeeds[1] = frequency;
+            chphases[1] = (5.0 - phase_opening);
+            break;
+        case 3:
+            chspeeds[2] = frequency;
+            chphases[2] = (12.5 - phase_opening);
+            break;
+        case 4:
+            chspeeds[3] = frequency;
+            chspeeds[3] = (30.0 - phase_opening);
+            break;
+    }
+
+SB_S3 = S23 - 991;
+SB_SZ = 5044.69 - 1909.9 - 991;
+st3vt = -SB_S3 * sin(2 * ang * M_PI / 180);
+// on PLP sz and dz refer to the sample and detector vert translation.
+// this is the y-axis in McStas.
+sz = -SB_SZ * sin(2 * ang * M_PI / 180.);
+sz_dz = - 2512 * tan(2* ang * M_PI / 180.);
+Y_MIRROR_ADJUST = 0.6 * sin(ang * M_PI / 180.) - 0.05 * cos(ang * M_PI / 180.);
+printf("YMIRROR ADJUST=%f", Y_MIRROR_ADJUST);
+Z_MIRROR_ADJUST = 0.6 * (1 - cos(ang * M_PI / 180)) - 0.05 * sin(ang * M_PI / 180.);
+}
+%}
+
+TRACE
+
+// TODO CHECK DISTANCES OF SLIT1 from end of FOM
+// TODO Add Al windows
+// TODO add reflectivities to fully define polarising mirror
+// TODO check what the exact factor for focus_ah in the source should be.
+// TODO: not currently simulating FOM, just the surrounding guide
+
+REMOVABLE COMPONENT platypus_origin = Progress_bar()
+AT (0, 0, 0) RELATIVE ABSOLUTE
+
+
+REMOVABLE COMPONENT start_platypus = Arm()
+AT (0, 0, 0) RELATIVE PREVIOUS
+
+
+// start_platypus is defined in ANSTO_CG3_PLATYPUS
+// and is designed to extract the top 20 mm of CG3.
+// It's also defined here in case we're simulating the
+// instrument without CG3.
+COMPONENT platypus = Arm()
+AT (0, 0, 0) RELATIVE start_platypus
+
+
+// The vertical divergence supplied by the guide is approximately
+// 2 * 0.1 * 3 * 22 = 13 degrees.
+// However the vertical divergence accepted by the slits is much
+// smaller than this, thereby reducing the efficiency of the
+// calculation. To improve statistics supply a focus_ah that is
+//  accepted by the collimation in order to improve the statistics.
+// If gravity is turned on then a higher vertical divergence of the
+// source is required to fill the vertical divergence, as the calculated
+// value will be too stringent. This is the factor of 10 in focus_ah.
+REMOVABLE COMPONENT source_div = Source_div(
+    xwidth=0.05, 
+    yheight=20 / 1000.0, 
+    focus_aw=2 * 0.1 * 3 * 22, 
+    focus_ah=20 * 180 * (ss2vg + ss3vg) / S23 / 3.142, 
+    lambda0=lambda0, 
+    dlambda=dlambda)
+AT (0, 0, 0) RELATIVE PREVIOUS
+
+
+COMPONENT end_cg3_to_FOM = Guide_gravity(
+    w1=0.05, 
+    h1=0.02, 
+    w2=0.05, 
+    h2=0.02, 
+    l=2.529, 
+    mleft=3, 
+    mright=3, 
+    mtop=1, 
+    mbottom=1)
+AT (0, 0, 0) RELATIVE PREVIOUS
+
+
+COMPONENT FOM = Guide_gravity(
+    w1=0.05, 
+    h1=0.02, 
+    w2=0.05,
+    h2=0.02,
+    l=0.567, 
+    mleft=3, 
+    mright=3, 
+    mtop=0, 
+    mbottom=1)
+AT (0, 0, 2.530) RELATIVE PREVIOUS
+
+
+// But it's 256 mm before chopper 1
+// roughly 50 mm after end of FOM
+COMPONENT slit1 = Slit(
+    xwidth=ss1hg/1000.0, 
+    yheight=ss1vg/1000.0)
+AT (0, 0, 0.617) RELATIVE PREVIOUS
+
+
+// guide just before chopper1
+// distance calculated as 256-33 - 6 = 217 mm
+// 256 is distance from slit1 to chopper 1. roughly 6 mm from end of guide to chopper 1
+// guide is 33 mm long.
+COMPONENT prechopper1 = Guide_gravity(
+    w1=0.05, 
+    h1=0.02, 
+    l=0.033, 
+    mleft=3, 
+    mright=3, 
+    mtop=1, 
+    mbottom=1)
+AT (0, 0, 0.217) RELATIVE PREVIOUS
+
+// this is where all distances are measured from
+// it corresponds to chopper1 location
+COMPONENT arm = Arm()
+AT (0, 0, 0.256) RELATIVE slit1
+
+
+// chopper 1.
+// When nu is positive the choppers are spinning clockwise looking from the detector to the source.
+// this corresponds to the choppers going UP through the beam on PLP.
+
+// When nu is negative the choppers are spinning anticlockwise looking from the detector to the source.
+// this corresponds to the choppers going DOWN through the beam on PLP.
+
+// beam centre is 320mm to middle. Beam should be centred on
+// half cutout height, i.e. radius - 0.5 * yheight
+
+// chopper relative chopper phasings have been verified for 2Å neutrons (@ -24 and 24 Hz) by placing a TOF
+// monitor directly after this component and checking that the flight time corresponds to half the distance
+// between chopper 1 and 3 to the monitor.
+COMPONENT chopper1 = DiskChopper(
+    theta_0=60, 
+    radius=0.35, 
+    yheight=0.06, 
+    nu=chspeeds[0], 
+    nslit=1, 
+    isfirst=1, 
+    phase=chphases[0])
+WHEN(use_choppers) AT (0, 0, 0) RELATIVE arm
+ROTATED (0, 0, 90) ABSOLUTE
+
+
+// distance set to 5mm after chopper distance
+COMPONENT between_chopper1_and_2 = Guide_gravity(
+    w1=0.05, 
+    h1=0.02, 
+    l=0.09,
+    mleft=3, 
+    mright=3, 
+    mtop=1, 
+    mbottom=1
+)
+AT (0, 0, 0.005) RELATIVE arm
+ROTATED (0, 0, 0) ABSOLUTE 
+
+
+// chopper 2 here
+// beam centre is 320mm to middle. Beam should be centred on
+// half cutout height, i.e. radius - 0.5 * yheight
+COMPONENT chopper2 = DiskChopper(
+    theta_0=10, 
+    radius=0.35, 
+    yheight=0.06, 
+    nu=chspeeds[1], 
+    nslit=1, 
+    phase=chphases[1])
+WHEN(use_choppers) AT (0, 0, 0.103) RELATIVE arm
+ROTATED (0, 0, 90) ABSOLUTE 
+
+
+// this is actually 3 separate pieces of guide, 3.3 + 16.8 + 3.3, each separated by 1 mm
+// distance set to 5mm after chopper distance
+COMPONENT between_chopper2_and_3 = Guide_gravity(
+    w1=0.05, 
+    h1=0.02, 
+    l=0.236,
+    mleft=3, 
+    mright=3, 
+    mtop=1, 
+    mbottom=1
+)
+AT (0, 0, 0.108) RELATIVE arm
+ROTATED (0, 0, 0) ABSOLUTE 
+
+
+// chopper 3 here.
+// beam centre is 320mm to middle. Beam should be centred on
+// half cutout height, i.e. radius - 0.5 * yheight
+
+COMPONENT chopper3 = DiskChopper(
+    theta_0=25, 
+    radius=0.35, 
+    yheight=0.06, 
+    nu=chspeeds[2],
+    nslit=1, 
+    phase=chphases[2])
+WHEN(use_choppers) AT (0, 0, 0.356) RELATIVE arm
+ROTATED (0, 0, 90) ABSOLUTE 
+
+
+// this is actually 3 separate pieces of guide, 3.3 + 36.8 + 3.3, each separated by 1 mm
+// distance set to 5mm after chopper distance
+COMPONENT between_chopper3_and_4 = Guide_gravity(
+    w1=0.05, 
+    h1=0.02, 
+    l=0.434,
+    mleft=3, 
+    mright=3, 
+    mtop=1, 
+    mbottom=1
+)
+AT (0, 0, 0.361) RELATIVE arm
+ROTATED (0, 0, 0) ABSOLUTE 
+
+
+// chopper 4 here
+// beam centre is 320mm to middle. Beam should be centred on
+// half cutout height, i.e. radius - 0.5 * yheight
+COMPONENT chopper4 = DiskChopper(
+    theta_0=60, 
+    radius=0.35, 
+    yheight=0.06, 
+    nu=chspeeds[3], 
+    nslit=1, 
+    phase=chphases[3])
+WHEN(use_choppers) AT (0, 0, 0.8058) RELATIVE arm
+ROTATED (0, 0, 90) ABSOLUTE 
+
+
+// this is actually 2 separate pieces of guide, 3.3 + 99.8, each separated by 1 mm
+// distance set to 5mm after chopper distance
+COMPONENT after4 = Guide_gravity(
+    w1=0.05, 
+    h1=0.02, 
+    l=1.032,
+    mleft=3, 
+    mright=3, 
+    mtop=1, 
+    mbottom=1
+)
+AT (0, 0, 0.8108) RELATIVE arm
+ROTATED (0, 0, 0) ABSOLUTE 
+
+
+// roughly 60 mm after end of guide
+// distance calculated by FARO
+COMPONENT slit2 = Slit(
+    xwidth=ss2hg / 1000.0, 
+    yheight=ss2vg / 1000.0)
+AT (0, 0, 1.909) RELATIVE arm
+ROTATED (0, 0, 0) ABSOLUTE 
+
+
+COMPONENT mirror_arm = Arm()
+AT (0, 0, 0.391) RELATIVE slit2
+
+
+// centred at 991 mm from slit2
+COMPONENT SB_mirror = Guide_gravity(
+    w1=0.05,
+    h1=0.1,
+    w2=0.05, 
+    h2=0.1, 
+    l=1.2, 
+    mleft=guide_m, 
+    mright=guide_m, 
+    mtop=4.0,
+    mbottom=0)
+AT (0, Y_MIRROR_ADJUST, Z_MIRROR_ADJUST) RELATIVE mirror_arm
+ROTATED(ang, 0, 0) RELATIVE mirror_arm
+
+
+COMPONENT slit3 = Slit(
+    xwidth=ss3hg / 1000.0, 
+    yheight=ss3vg/1000.0)
+AT (0, st3vt/1000.0, S23/1000.0) RELATIVE slit2
+ROTATED (0, 0, 0) ABSOLUTE 
+
+
+// distance calculated by FARO
+COMPONENT sample = Slit(
+    xwidth=(sample_width) / 1000.0, 
+    yheight=0.1)
+AT (0, sz/1000.0, 5.0447) RELATIVE arm
+
+
+COMPONENT psdlin_monitor = PSDlin_monitor(
+    nx=101, 
+    filename="xpos", 
+    xwidth=0.16,
+    yheight=0.2,
+    restore_neutron=1)
+AT (0, sz_dz/1000.0, 2.512) RELATIVE sample
+
+
+COMPONENT l_monitor = L_monitor(
+    nL=36, 
+    xwidth=0.16,
+    yheight=0.2, 
+    Lmin=2.25, 
+    Lmax=20.25,
+    filename="det"
+)
+AT (0, sz_dz/1000.0, 2.512) RELATIVE sample
+
+
+FINALLY
+%{
+%}
+
+END
