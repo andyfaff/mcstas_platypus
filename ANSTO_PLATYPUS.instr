@@ -81,7 +81,7 @@ if(use_choppers){
             chspeeds[3] = (30.0 - phase_opening);
             break;
     }
-
+}
 if(strcmp(mode, "FOC") == 0){
 	USE_FOC = 1;
 } else if (strcmp(mode, "POL") == 0){
@@ -89,7 +89,6 @@ if(strcmp(mode, "FOC") == 0){
 	USE_POL = 1;
 }
 
-}
 %}
 
 TRACE

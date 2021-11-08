@@ -35,7 +35,7 @@
 * double ss4hg: [mm] width of slit4 gap
 * double sample_width: [mm] width of sample
 * double omega: [deg] angle of incidence onto the sample
-
+* double slit3_offset: [mm] longitudinal offset of slit3 blades along beam
 
 *
 * %L
@@ -48,7 +48,7 @@ int use_choppers=1,  double frequency=-24.0,
 int following_chopper=3, double phase_opening=0.0, double ss1vg=15.0, double ss2vg=6.955,
 double ss3vg=2, double ss4vg=10, double S23=3036.0, double SAM_S4=400, double ss1hg=50.0,
 double ss2hg=50,  double ss3hg=20, double ss4hg=45,
-double sample_width=20.0, double omega=1.0)
+double sample_width=20.0, double omega=1.0, double slit3_offset=1.0)
 
 DECLARE
 %{
@@ -59,6 +59,10 @@ double omega_2;
 double SB_S3;
 double SB_SZ;
 double SB_S4;
+double SS3D_DISTANCE;
+double SS3U_DISTANCE;
+double st3vt_u;
+double st3vt_d;
 double st3vt;
 double st4vt;
 double sz;
@@ -69,6 +73,7 @@ double Z_MIRROR_ADJUST;
 
 INITIALIZE
 %{
+
 memset(chspeeds, 0, sizeof(double) * 4);
 memset(chphases, 0, sizeof(double) * 4);
 
@@ -89,25 +94,43 @@ if(use_choppers){
             chspeeds[3] = frequency;
             chspeeds[3] = (30.0 - phase_opening);
             break;
-    }
+	default:
+	     break;
+  }
+}
 
+// distances along beamline
 SB_S3 = S23 - 991;
 SB_SZ = 5044.69 - 1909.9 - 991;
 SB_S4 = SB_SZ + SAM_S4;
 
+// angle of deflection mirror
 omega_2 = omega / 2.0;
+
+// how much the down and up blades are separated by longitudinally along the beamline
+SS3D_DISTANCE = (S23 - 0.5*slit3_offset + 1909.9)/1000.0;
+SS3U_DISTANCE = (S23 + 0.5*slit3_offset + 1909.9)/1000.0;
+
+// offset of the centre of slit3
 st3vt = -SB_S3 * sin(omega * M_PI / 180);
+
+// use two separate rectangular apertures to simulate parallax error
+// let's use a really large gap of 20mm to simulate that
+st3vt_d =  st3vt - 0.5*ss3vg + 10;
+st3vt_u =  st3vt + 0.5*ss3vg - 10;
+st3vt_d = st3vt_d / 1000;
+st3vt_u = st3vt_u / 1000;
+
 // on PLP sz and dz refer to the sample and detector vert translation.
 // this is the y-axis in McStas.
-sz = -SB_SZ * sin(omega * M_PI / 180.);
-dz = - 2512 * tan(omega * M_PI / 180.);
-st4vt = sz - SAM_S4 * tan(omega * M_PI / 180.);
+sz = -SB_SZ * sin(omega * M_PI / 180.) / 1000;
+dz = - 2512 * tan(omega * M_PI / 180.) / 1000;
+st4vt = sz - SAM_S4 * tan(omega * M_PI / 180.) / 1000;
 
 // omega is angle of incidence onto sample,  therefore angle of incidence onto mirror is omega/2
 Y_MIRROR_ADJUST = 0.6 * sin(omega_2 * M_PI / 180.) - 0.05 * cos(omega_2 * M_PI / 180.);
-printf("YMIRROR ADJUST=%f", Y_MIRROR_ADJUST);
 Z_MIRROR_ADJUST = 0.6 * (1 - cos(omega_2 * M_PI / 180)) - 0.05 * sin(omega_2 * M_PI / 180.);
-}
+
 %}
 
 TRACE
@@ -362,10 +385,19 @@ AT (0, Y_MIRROR_ADJUST, Z_MIRROR_ADJUST) RELATIVE mirror_arm
 ROTATED(omega_2, 0, 0) RELATIVE mirror_arm
 
 
-COMPONENT slit3 = Slit(
+// separate ss3u and ss3d blades to examine parallax
+// ss3vg is incorporated by using different st3vt
+COMPONENT slit3d = Slit(
     xwidth=ss3hg / 1000.0, 
-    yheight=ss3vg/1000.0)
-AT (0, st3vt/1000.0, S23/1000.0) RELATIVE slit2
+    yheight=0.02)
+AT (0, st3vt_d, SS3D_DISTANCE) RELATIVE arm
+ROTATED (0, 0, 0) ABSOLUTE 
+
+
+COMPONENT slit3u = Slit(
+    xwidth=ss3hg / 1000.0, 
+    yheight=0.02)
+AT (0, st3vt_u, SS3U_DISTANCE) RELATIVE arm
 ROTATED (0, 0, 0) ABSOLUTE 
 
 
@@ -373,13 +405,13 @@ ROTATED (0, 0, 0) ABSOLUTE
 COMPONENT sample = Slit(
     xwidth=(sample_width) / 1000.0, 
     yheight=0.1)
-AT (0, sz/1000.0, 5.0447) RELATIVE arm
+AT (0, sz, 5.0447) RELATIVE arm
 
 
 COMPONENT slit4 = Slit(
     xwidth=ss4hg / 1000.0, 
     yheight=ss4vg / 1000.0)
-AT (0, st4vt/1000.0, 5.0447 + (SAM_S4/1000.0)) RELATIVE arm
+AT (0, st4vt, 5.0447 + (SAM_S4/1000.0)) RELATIVE arm
 ROTATED (0, 0, 0) ABSOLUTE 
 
 
@@ -389,7 +421,7 @@ COMPONENT psdlin_monitor = PSDlin_monitor(
     xwidth=0.16,
     yheight=0.2,
     restore_neutron=1)
-AT (0, dz/1000.0, 2.512) RELATIVE sample
+AT (0, dz, 2.512) RELATIVE sample
 
 
 COMPONENT l_monitor = L_monitor(
@@ -400,7 +432,7 @@ COMPONENT l_monitor = L_monitor(
     Lmax=20.25,
     filename="det"
 )
-AT (0, dz/1000.0, 2.512) RELATIVE sample
+AT (0, dz, 2.512) RELATIVE sample
 
 
 FINALLY
