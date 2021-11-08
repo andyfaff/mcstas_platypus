@@ -10,14 +10,13 @@
 * The PLATYPUS instrument at ANSTO, sits on the CG3 guide.
 *
 * %Description
-* The PLATYPUS TOF reflectometer at ANSTO
+* The PLATYPUS TOF reflectometer at ANSTO, free-liquids mode
 *
 * Example: <parameters=values>
 *
 * %Parameters
 * double lambda0: [A] mean wavelength
 * double dlambda: [A] Half width of uniform wavelength distribution
-* double guide_m: m coating of focussing guide sides
 * use_choppers: [1] whether to use choppers or not
 * frequency: [Hz] the chopper frequency, negative means chopping down through the beam, 
     positive up through beam
@@ -28,11 +27,14 @@
 * double ss1vg: [mm] height of slit1 gap
 * double ss2vg: [mm] height of slit2 gap
 * double ss3vg: [mm] height of slit3 gap
+* double ss4vg: [mm] height of slit4 gap
 * double S23: [mm] slit2 to slit3 distance
-* double ss1hg: [mm] height of slit1 gap
-* double ss2hg: [mm] height of slit2 gap
-* double ss3hg: [mm] height of slit3 gap
-* sample_width: [mm] width of sample
+* double ss1hg: [mm] width of slit1 gap
+* double ss2hg: [mm] width of slit2 gap
+* double ss3hg: [mm] width of slit3 gap
+* double ss4hg: [mm] width of slit4 gap
+* double sample_width: [mm] width of sample
+* double omega: [deg] angle of incidence onto the sample
 
 
 *
@@ -41,23 +43,26 @@
 *
 * %E
 *******************************************************************************/
-DEFINE INSTRUMENT PLATYPUS_ANSTO(double lambda0=11.0, dlambda=10.0, double guide_m=4.0,
+DEFINE INSTRUMENT PLATYPUS_ANSTO(double lambda0=11.0, dlambda=10.0,
 int use_choppers=1,  double frequency=-24.0,
 int following_chopper=3, double phase_opening=0.0, double ss1vg=15.0, double ss2vg=6.955,
-double ss3vg=2, double S23=3036.0, double ss1hg=50.0, double ss2hg=50,  double ss3hg=20, 
-double sample_width=20.0, double ang=0.0)
+double ss3vg=2, double ss4vg=10, double S23=3036.0, double SAM_S4=400, double ss1hg=50.0,
+double ss2hg=50,  double ss3hg=20, double ss4hg=45,
+double sample_width=20.0, double omega=1.0)
 
 DECLARE
 %{
 
 double chspeeds[4];
 double chphases[4];
+double omega_2;
 double SB_S3;
 double SB_SZ;
+double SB_S4;
 double st3vt;
 double st4vt;
 double sz;
-double sz_dz;
+double dz;
 double Y_MIRROR_ADJUST;
 double Z_MIRROR_ADJUST;
 %}
@@ -88,14 +93,20 @@ if(use_choppers){
 
 SB_S3 = S23 - 991;
 SB_SZ = 5044.69 - 1909.9 - 991;
-st3vt = -SB_S3 * sin(2 * ang * M_PI / 180);
+SB_S4 = SB_SZ + SAM_S4;
+
+omega_2 = omega / 2.0;
+st3vt = -SB_S3 * sin(omega * M_PI / 180);
 // on PLP sz and dz refer to the sample and detector vert translation.
 // this is the y-axis in McStas.
-sz = -SB_SZ * sin(2 * ang * M_PI / 180.);
-sz_dz = - 2512 * tan(2* ang * M_PI / 180.);
-Y_MIRROR_ADJUST = 0.6 * sin(ang * M_PI / 180.) - 0.05 * cos(ang * M_PI / 180.);
+sz = -SB_SZ * sin(omega * M_PI / 180.);
+dz = - 2512 * tan(omega * M_PI / 180.);
+st4vt = sz - SAM_S4 * tan(omega * M_PI / 180.);
+
+// omega is angle of incidence onto sample,  therefore angle of incidence onto mirror is omega/2
+Y_MIRROR_ADJUST = 0.6 * sin(omega_2 * M_PI / 180.) - 0.05 * cos(omega_2 * M_PI / 180.);
 printf("YMIRROR ADJUST=%f", Y_MIRROR_ADJUST);
-Z_MIRROR_ADJUST = 0.6 * (1 - cos(ang * M_PI / 180)) - 0.05 * sin(ang * M_PI / 180.);
+Z_MIRROR_ADJUST = 0.6 * (1 - cos(omega_2 * M_PI / 180)) - 0.05 * sin(omega_2 * M_PI / 180.);
 }
 %}
 
@@ -343,12 +354,12 @@ COMPONENT SB_mirror = Guide_gravity(
     w2=0.05, 
     h2=0.1, 
     l=1.2, 
-    mleft=guide_m, 
-    mright=guide_m, 
+    mleft=4, 
+    mright=4, 
     mtop=4.0,
     mbottom=0)
 AT (0, Y_MIRROR_ADJUST, Z_MIRROR_ADJUST) RELATIVE mirror_arm
-ROTATED(ang, 0, 0) RELATIVE mirror_arm
+ROTATED(omega_2, 0, 0) RELATIVE mirror_arm
 
 
 COMPONENT slit3 = Slit(
@@ -365,13 +376,20 @@ COMPONENT sample = Slit(
 AT (0, sz/1000.0, 5.0447) RELATIVE arm
 
 
+COMPONENT slit4 = Slit(
+    xwidth=ss4hg / 1000.0, 
+    yheight=ss4vg / 1000.0)
+AT (0, st4vt/1000.0, 5.0447 + (SAM_S4/1000.0)) RELATIVE arm
+ROTATED (0, 0, 0) ABSOLUTE 
+
+
 COMPONENT psdlin_monitor = PSDlin_monitor(
     nx=101, 
     filename="xpos", 
     xwidth=0.16,
     yheight=0.2,
     restore_neutron=1)
-AT (0, sz_dz/1000.0, 2.512) RELATIVE sample
+AT (0, dz/1000.0, 2.512) RELATIVE sample
 
 
 COMPONENT l_monitor = L_monitor(
@@ -382,7 +400,7 @@ COMPONENT l_monitor = L_monitor(
     Lmax=20.25,
     filename="det"
 )
-AT (0, sz_dz/1000.0, 2.512) RELATIVE sample
+AT (0, dz/1000.0, 2.512) RELATIVE sample
 
 
 FINALLY
