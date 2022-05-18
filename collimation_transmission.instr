@@ -75,21 +75,34 @@ AT (0, 0, 0) RELATIVE PREVIOUS
 // If gravity is turned on then a higher vertical divergence of the
 // source is required to fill the vertical divergence, as the calculated
 // value will be too stringent. This is the factor of 10 in focus_ah.
-// 20 * 180 * (ss2vg + ss3vg) / L23 / 3.142,
+// ah = 20 * 180 * (ss2vg + ss3vg) / L23 / 3.142,
+// aw = 2 * 0.1 * 3 * 22, 
 REMOVABLE COMPONENT source_div = Source_div(
     xwidth=0.05, 
     yheight=20 / 1000.0, 
-    focus_aw=2 * 0.1 * 3 * 22, 
-    focus_ah=0.5,
+    focus_aw=2 * 0.1 * 3 * 22,
+    focus_ah=20 * 180 * (ss2vg + ss3vg) / L23 / 3.142,
     lambda0=lambda0, 
     dlambda=dlambda)
+AT (0, 0, 0) RELATIVE PREVIOUS
+
+
+// guide to filter to get the correct vertical and horizontal divergences
+COMPONENT guide_gravity = Guide_gravity(
+    w1=0.05, 
+    h1=0.02, 
+    l=30, 
+    mleft=3, 
+    mright=3, 
+    mtop=1, 
+    mbottom=1)
 AT (0, 0, 0) RELATIVE PREVIOUS
 
 
 COMPONENT slit2 = Slit(
     xwidth=ss2hg / 1000.0, 
     yheight=ss2vg / 1000.0)
-AT (0, 0, 0) RELATIVE arm
+AT (0, 0, 30.1) RELATIVE arm
 ROTATED (0, 0, 0) ABSOLUTE 
 
 
@@ -126,7 +139,7 @@ ROTATED (0, 0, 0) ABSOLUTE
 COMPONENT sample = Slit(
     xwidth=(sample_width) / 1000.0, 
     yheight=0.05)
-AT (0, 0, L3S) RELATIVE slit3
+AT (0, 0, L3S/1000.0) RELATIVE slit3
 ROTATED (0, 0, 0) ABSOLUTE 
 
 
